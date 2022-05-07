@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<style>
+    .but{
+        width: 100%;
+        border-style:none;
+        outline:0;
+        text-align: left;
+    }
+    .but_del:hover{
+        background-color: red;
+        color: white;
+    }
+    .but_oth:hover{
+        background-color: rgba(206, 215, 231, 0.73);
+    }
+    th{
+        padding:0px 20px;
+    }
+     table.gridtable {
+         font-family: verdana,arial,sans-serif;
+         font-size:11px;
+         color:#333333;
+         border-width: 1px;
+         border-color: #666666;
+         border-collapse: collapse;
+         table-layout: fixed;
+         width: 98%;
+         {#border:1px solid gray;#}
+         text-align:left;
+     }
+     table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #dedede;
+     }
+     table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+     }
+</style>
+<body>
+<nav class="navbar navbar-default" role="navigation" style="position: absolute;top: 35px;left: 80px;width:-webkit-calc(100% - 200px);z-index: 1">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <span style="font-size: xx-small" class="navbar-brand" >项目名称：{{ project.name }}</span>
+            <a class="navbar-brand" href="/project_list/">返回项目列表</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/apis/{{project.id}}/">接口库</a></li>
+                <li><a href="/cases/{{project.id}}/">用例库</a></li>
+                <li><a href="/project_set/{{project.id}}/">项目设置</a></li>
+            </ul>
+        </div>
+        <div style="margin-top: 8px;float: right;height: 35px;width: 300px;">
+            <select name="enVar" id="enVar" style="margin-top: 5px;width: 74%;height: 26px;">
+                <option value="0">请选择</option>
+                {% for i in project_host_folders %}
+                    <option value="{{i.id}}">{{ i.name }}</option>
+                {% endfor %}
+            </select>&nbsp
+            <img src="/static/look.png" style="width: 25px;margin: 0px 8px;" onclick="look_host()" id="look">
+            <img src="/static/list.png" id="host_folder" style="width: 25px;">
+        </div>
+    </div>
+</nav>
+<div class="table table-striped" style="padding-left: 10px;margin-top: 10px;">
+    <div id = "total{{project.id}}" style="line-height:30px;width:388px;float:left;padding:5px;overflow-y: scroll;">
+        <div id = "folderList{{project.id}}">
+            {% for i in project_folder %}
+                <div id="folder{{i.id}}" >
+                    <button style="border-style:none; width: 260px; float: left; text-align: left; outline:0;background-color: white;word-break: keep-all;white-space: nowrap;overflow: hidden;text-overflow: ellipsis" onclick="open_folder('{{i.project_id}}','{{i.id}}')">
+                        <img src="/static/Right_Arrow.png" style="width: 6%">
+                        <img src="/static/folder.png" style="width: 9%; margin: 0 6px;" >
+                        <span>{{i.name}}</span>
+                    </button>
+                    <span id={{i.id}} style="float:right;">
+                         <button id="more_folder_{{i.id}}"  onclick="showDiv('folder','{{project.id}}','{{i.id}}')" title="View more actions" style="position: relative;border-style:none;outline:0;background-color: white; " >more</button>
+                        <!-- 弹出框div绝对定位 -->
+                        <div id="more_folder_page_{{i.id}}" style="position: absolute;display:none; left: 220px; border-radius: 4px;z-index: 9999 ;box-shadow: grey 4px 4px 8px; width: 160px;height: 128px;background-color: rgb(238, 238, 238);">
+                            <button type="button" class="but but_oth" onclick="edit_folder('i.project_id','{{i.id}}','{{i.name}}')"><img src="/static/edit.png" style="width:19px;margin: 0px 9px;">Edit</button>
+                            <button type="button" class="but but_oth" onclick="add_project_api('{{i.project_id}}','{{i.id}}')"><img src="/static/add_file.png" style="width:19px;margin: 0px 9px;">Add Request</button>
+                            <button type="button" class="but but_oth" onclick="add_project_folder_div('{{i.project_id}}','{{i.id}}')"><img src="/static/add_folder.png" style="width:19px;margin: 0px 9px;">Add Folder</button>
+                            <button type="button" class="but but_del" onclick="delete_d('folder','{{i.id}}','{{i.name}}')"><img src="/static/del_project.png" style="width:19px;margin: 0px 9px;">Delete</button>
+                        </div>
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+        <div id = "apiList{{project.id}}">
+            {% for i in apis %}
+                <div id="api{{i.id}}">
+                    <button style="border-style:none; width: 260px; float: left; text-align: left; outline:0;background-color: white;word-break: keep-all;white-space: nowrap;overflow: hidden;text-overflow: ellipsis" onclick="ts_show('{{i.id}}')">
+                        <span style="color: #f0ad4e ;font-weight: bold">{{i.api_method}}</span>
+                        &nbsp&nbsp
+                        <span>{{i.name}}</span>
+                    </button>
+                    <span style="float:right;">
+                        <button id="more_api_{{i.id}}" style="position: relative;border-style:none;outline:0;background-color: white;" onclick="showDiv('api','{{project.id}}','{{i.id}}')" title="View more actions">more</button>
+                         <!-- 弹出框div绝对定位 -->
+                        <div id="more_api_page_{{i.id}}" style="position: absolute;display:none; left: 220px; border-radius: 4px;z-index: 9999 ;box-shadow: grey 4px 4px 8px; width: 160px;height: 64px;background-color: rgb(238, 238, 238);">
+                            <button type="button" class="but but_oth" onclick="edit_api('i.project_id','{{i.id}}','{{i.name}}')"><img src="/static/edit.png" style="width:19px;margin: 0px 9px;">Edit</button>
+                            <button type="button" class="but but_del" onclick="delete_d('api','{{i.id}}','{{i.name}}')"><img src="/static/del_project.png" style="width:19px;margin: 0px 9px;">Delete</button>
+                        </div>
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="shu" style="width: 2px;background-color: #262c2c;position: absolute;top: 98px;left: 400px;"></div>
+    <div id="debug" style="float: left; display: none;width: 100%;margin-left: 12px">
+        <div style="margin-left: 7px;height: 362px;">
+            <div class="btn-group" style="float: right;right: 31px">
+                <button onclick="ts_send('save')" type="button" class="btn btn-success" style="outline: none">保存</button>
+                <button onclick="ts_close()" type="button" class="btn btn-default" style="outline: none">取消</button>
+            </div>
+            <h3>接口：<small id="ts_api_id" style="color: white"></small>-
+                <input placeholder="请在此输入接口名称" type="text" id="ts_api_name" style="padding-left: 5px;width: 50%;color: #329124;outline: none;">
+{#                <select name="ts_login" id="ts_login" style="color: black;outline: none">#}
+{#                    <option value="no" id="ts_login_no">不加登录态</option>#}
+{#                    <option value="yes" id="ts_login_yes">加登录态</option>#}
+{#                </select>#}
+            </h3>
+            <ul class="nav navbar-nav" style="width: 98%;">
+                <li>
+                    <select name="" id="ts_method" style="height: 40px;" class="form-control">
+                        <option value="none">请求方式</option>
+                        <option value="post">POST</option>
+                        <option value="get">GET</option>
+                        <option value="put">PUT</option>
+                        <option value="delete">DELETE</option>
+                    </select>
+                </li>
+                <li style="width: -webkit-calc(100% - 225px);">
+                    <input id="ts_url" type="text" style="width: 100%;height: 40px;padding-left: 10px;outline: none;color: black"
+                           placeholder="Enter request URL" value="">
+                </li>
+                <li>
+                    <button onclick="ts_send('send')" type="button" style="width: 120px;height: 40px;outline: none;"
+                            class="btn btn-default"><span style="font-size: large">Send</span></button>
+                </li>
+            </ul>
+            <br><br><br>
+<!--            2022.04.21新增 以下部分：更新header-->
+            <ul id="enter_refer" class="nav nav-tabs" style="width: 98%;">
+                <li class="active"><a href="#headers" data-toggle="tab">headers</a></li>
+                <li><a href="#body" data-toggle="tab">body</a></li>
+            </ul>
+            <div  class="tab-content" style="width: 98%;height: 70%;border-style: ridge;overflow-y: scroll;">
+                <div class="tab-pane fade in active" id="headers">
+                    <div class="table-responsive" style="color: black">
+                        <table class="table table-bordered table-striped" id="mytable2" style="background-color:white">
+                            <thead style="color: #337ab7;font-size: x-small">
+                              <tr>
+                                <td style="width: 49%">Key</td>
+                                <td style="width: 48%">Value</td>
+                                <td style="width: 3%"></td>
+                              </tr>
+                            </thead>
+                            <tbody id="mytbody2">
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-default" id="add2" style="outline: none;" onclick="add_header('','')"><i class="fa fa-plus"></i> 添加新参数</button>
+                </div>
+                <div class="tab-pane fade" id="body">
+                    <input type="radio" name="body" value="none" style="margin: 10px 5px 0px 30px;" checked = "checked" />none
+                    <input type="radio" name="body" value="form-data" style="margin: 10px 5px 0px 30px;" />form-data
+                    <input type="radio" name="body" value="x-www-form-urlencoded" style="margin: 10px 5px 0px 30px;" />x-www-form-urlencoded
+                    <input type="radio" name="body" value="raw" style="margin: 10px 5px 0px 30px;" />raw
+                    <input type="radio" name="body" value="binary" style="margin: 10px 5px 0px 30px;" />binary
+                    <input type="radio" name="body" value="GraphQL" style="margin: 10px 5px 0px 30px;" />GraphQL
+                    <select id="raw" style="display: none;margin-left: 15px;">
+                        <option class="tab-pane fade" id="Text">Text</option>
+                        <option class="tab-pane fade" id="Javascript">Javascript</option>
+                        <option class="tab-pane fade" id="Json">Json</option>
+                        <option class="tab-pane fade" id="Html">Html</option>
+                        <option class="tab-pane fade" id="Xml">Xml
+                        </option>
+                    </select>
+                    <div id="none" style="color: darkgray;text-align: center;margin-top: 10px;">This request does not have a body</div>
+                    <div id="form-data" style="display:none;color: darkgray;text-align: center;margin-top: 10px;">功能暂未开放</div>
+                    <div id="x-www-form-urlencoded" style="display:none;color: darkgray;text-align: center;margin-top: 10px;">功能暂未开放</div>
+                    <div id="binary" style="display:none;color: darkgray;text-align: center;margin-top: 10px;">功能暂未开放</div>
+                    <div id="GraphQL" style="display:none;color: darkgray;text-align: center;margin-top: 10px;">功能暂未开放</div>
+                    <textarea id="raw_data" rows="10" cols="200" style="display: none;border-color: cadetblue;margin: 7px 0px 0px 7px;"></textarea>
+                </div>
+            </div>
+            <br>
+
+            <ul id="myTab" class="nav nav-tabs" style="width: 98%;">
+                <li><a href="#response" data-toggle="tab">返回体</a></li>
+            </ul>
+            <div id="myTabContent" class="tab-content">
+                <div class="tab-pane fade" id="response">
+                    <textarea name="" id="ts_response_body" cols="30" rows="10" style="color: black;width: 98%;height: 300px;background-color: white;" disabled="disabled"></textarea>
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+</div>
+<br>
+<div style="position: fixed;bottom: 0px;width: 100%;background-color: #f8f8f8;
+text-align: center;border: 1px solid #e7e7e7;">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default" onclick="add_project_folder_div('{{project.id}}','')">新增目录</button>
+        <button type="button" class="btn btn-default" onclick="add_project_api('{{project.id}}','')">新增接口</button>
+{#        <button type="button" class="btn btn-default" onclick="project_header_div_show()" style="outline: none">全局请求头</button>#}
+{#        <button type="button" class="btn btn-default" onclick="login_show()" style="outline: none">登录态接口</button>#}
+    </div>
+</div>
+<div id="add_project_api" style="width: 20%;background-color: white;position: absolute;
+    left: 39%;top: 38%;padding-left: 10px;box-shadow: 4px 4px 8px gray;border-radius: 5px;display: none">
+    <h3>新增接口</h3>
+    <input id="api_name" type="text" placeholder="请输入接口名称" style="width: 95%">
+    <br><br>
+    <input id="api_des" type="text" placeholder="请输入接口备注" style="width: 95%">
+    <br><br>
+    <button onclick="mengceng_close('add_project_api')" class="btn btn-danger" style="outline: none">取消</button>
+    <button id="add_api_Y" class="btn btn-success" style="outline: none">确定</button>
+    <br><br>
+</div>
+<div id="add_project_folder_div" style="width: 20%;background-color: white;position: absolute;
+    left: 39%;top: 38%;padding-left: 10px;box-shadow: 4px 4px 8px gray;border-radius: 5px;display: none">
+    <h3>新增目录</h3>
+    <input id="project_folder_name" type="text" placeholder="请输入目录名称" style="width: 95%">
+    <br><br>
+    <button onclick="mengceng_close('add_project_folder_div')" class="btn btn-danger" style="outline: none">取消</button>
+    <button id="add_folder_Y" class="btn btn-success" style="outline: none">确定</button>
+    <br><br>
+</div>
+<div id="edit_folder_div" style="width: 20%;background-color: white;position: absolute;
+    left: 39%;top: 38%;padding-left: 10px;box-shadow: 4px 4px 8px gray;border-radius: 5px;display: none">
+    <h3>编辑目录名</h3>
+    <input id="project_folder_name" type="text" placeholder="请输入目录名称" style="width: 95%">
+    <br><br>
+    <button onclick="mengceng_close('edit_folder_div')" class="btn btn-danger" style="outline: none">取消</button>
+    <button id="edit_folder_Y" class="btn btn-success" style="outline: none">确定</button>
+    <br><br>
+</div>
+<div id="edit_api_div" style="width: 20%;background-color: white;position: absolute;
+    left: 39%;top: 38%;padding-left: 10px;box-shadow: 4px 4px 8px gray;border-radius: 5px;display: none">
+    <h3>编辑接口名</h3>
+    <input id="project_folder_name" type="text" placeholder="请输入接口名称" style="width: 95%">
+    <br><br>
+    <button onclick="mengceng_close('edit_api_div')" class="btn btn-danger" style="outline: none">取消</button>
+    <button id="edit_api_Y" class="btn btn-success" style="outline: none">确定</button>
+    <br><br>
+</div>
+
+{# 备注弹层及函数 #}
+<div id="bz" style="display:none;width: 50%;height: 50%;position: fixed;left: 25%;top: 35%;background-color: #3c4043;box-shadow: 4px 4px 8px grey;">
+    <input id="which_api" type="text" style="display: none;">
+    <textarea name="" id="bz_value" cols="30" rows="10" style="width: 100%;height: 80%;" placeholder="请输入接口备注"></textarea>
+    <button onclick="save_bz()" style="width: 49.9%;height: 20%;">保存</button>
+    <button onclick="close_bz()" style="width: 49.3%;height: 20%;">取消</button>
+</div>
+<div id="look_host_div" style="width: 30%;height:50%;background-color: white;position: absolute;padding-left: 10px;box-shadow: 4px 4px 8px gray;border-radius: 5px;background-color: #f8f8f8;display: none; overflow: auto;">
+    <table style="margin-top: 10px;" class="gridtable" id="look_host">
+        <thead>
+            <tr>
+                <th>VARIABLE</th>
+                <th>INITIAL VALUE</th>
+            </tr>
+        </thead>
+        <tbody id="look_host_body">
+
+        </tbody>
+    </table>
+</div>
+<script>
+    $(function () {
+        var category = document.getElementById('enVar');
+        var ops = category.options;
+        for (var i=0;i<ops.length;i++){
+            if (ops[i].value=={{ project.local_variable_id}}){
+                ops[i].selected = true;
+                return;
+            }
+        }
+    });
+
+    $(function () {
+        var table = document.getElementById('look_host');
+        table.getElementsByTagName('th')[0].style.width = '18%';
+        table.getElementsByTagName('th')[1].style.width = '82%';
+    })
+    // 单选框radio绑定click事件
+    $(":radio").click(function () {
+        if ($(this).val()=='none'){
+            document.getElementById('raw').style.display = "none";
+            document.getElementById('form-data').style.display = "none";
+            document.getElementById('raw_data').style.display='none';
+            document.getElementById('none').style.display = "block";
+
+        }
+        if ($(this).val()=='form-data'){
+            document.getElementById('none').style.display = 'none';
+            document.getElementById('raw').style.display = "none";
+            document.getElementById('raw_data').style.display='none';
+            document.getElementById('form-data').style.display = "block";
+        }
+        if ($(this).val()=='raw'){
+            document.getElementById('none').style.display = 'none';
+            document.getElementById('form-data').style.display = "none";
+            document.getElementById('raw').style.display = "inline";
+            document.getElementById('raw_data').style.display='block';
+        }
+        if ($(this).val()=='x-www-form-urlencoded'){
+            document.getElementById('none').style.display = 'none';
+            document.getElementById('raw').style.display = "none";
+            document.getElementById('raw_data').style.display='none';
+            document.getElementById('form-data').style.display = "block";
+        }
+        if ($(this).val()=='binary'){
+            document.getElementById('none').style.display = 'none';
+            document.getElementById('raw').style.display = "none";
+            document.getElementById('raw_data').style.display='none';
+            document.getElementById('form-data').style.display = "block";
+        }
+        if ($(this).val()=='GraphQL'){
+            document.getElementById('none').style.display = 'none';
+            document.getElementById('raw').style.display = "none";
+            document.getElementById('raw_data').style.display='none';
+            document.getElementById('form-data').style.display = "block";
+        }
+    })
+    $("#enVar").change(function () {
+        var checkValue = $("#enVar").find("option:selected").val()
+         $.get('/edit_project/',{
+            "project_id":"{{ project.id }}",
+             "local_variable_id":checkValue,
+        },function (ret) {
+
+        })
+    })
+
+    $("#host_folder").click(function () {
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('project_host_folder').style.zIndex='999';
+        document.getElementById("project_host_folder").style.display = 'block';
+    })
+    function look_host() {
+        var look = document.getElementById('look_host_div')//$("#enVar").find("option:selected").val()
+        var look_host_body = document.getElementById('look_host_body')
+        if (look.style.display == "block"){
+            look.style.display = "none";
+            look_host_body.parentNode.removeChild(look_host_body)
+            var tbody = document.createElement('tbody')
+            tbody.id = 'look_host_body'
+            document.getElementById('look_host').appendChild(tbody)
+        }else {
+            look.style.display = "block";
+            var Y = event.clientY-event.offsetY //获取点击按钮位置
+            var X = event.clientX-event.offsetX
+            var h = (look.style.height).split('px')[0]
+            look.style.top = (Y+38).toString()+'px'; //加上点击按钮的height
+            look.style.left = (X-496).toString()+'px';
+
+            $.get('/get_project_host/',{
+                "host_folder_id":$("#enVar").find("option:selected").val(),
+            },function (ret) {
+                 for (var i=0;i<ret.length;i++){
+                     var tr1 = document.createElement('tr');
+                     var td1 = document.createElement('td');
+                     td1.innerText = ret[i]['name']
+                     var td2 = document.createElement('td');
+                     td2.innerText = ret[i]['host']
+                     tr1.appendChild(td1)
+                     tr1.appendChild(td2)
+                     look_host_body.appendChild(tr1)
+                 }
+            })
+        }
+    }
+
+    $(document).mouseup(function (e) {
+        var dc = $('#look_host_div');
+        console.log(!dc.is(e.target) && dc.has(e.target).length==0 &&!e.target.id=='look')
+        if (!dc.is(e.target) && dc.has(e.target).length==0 &&e.target.id!='look'){
+            var look = document.getElementById('look_host_div')
+            if (look.style.display=='block'){
+                look.style.display = "none";
+            }
+        }
+    })
+
+    function add_header(key,value) {
+        var tbody = document.getElementById('mytable2').getElementsByTagName('tbody')[0];
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        var input1 = document.createElement('input');
+        input1.style.width = '100%';
+        if (key){
+            input1.value = key
+        }
+        td1.appendChild(input1);
+
+        var td2 = document.createElement('td');
+        var input2 = document.createElement('input');
+        input2.style.width = '100%';
+        if (value){
+            input2.value = value
+        }
+        td2.appendChild(input2);
+
+        var td3 = document.createElement('td');
+        var but = document.createElement('button');
+        {#but.innerText = 'X';#}
+        but.className='glyphicon glyphicon-trash'
+        but.onclick = function (){
+            $(this).parent().parent()[0].style.display = 'none';
+        }
+
+        td3.appendChild(but);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+
+        tbody.appendChild(tr)
+    }
+    function open_bz(id) {
+        document.getElementById('bz_value').value = '';
+        $.get('/get_bz/',{
+            'api_id':id
+        },function (ret) {
+            document.getElementById('bz').style.display = 'block';
+            document.getElementById('which_api').value = id;
+            document.getElementById('bz_value').value = ret;
+        })
+    }
+    function save_bz() {
+        id = document.getElementById('which_api').value;
+        bz_value = document.getElementById('bz_value').value;
+        $.get('/save_bz/',{
+            'api_id':id,
+            'bz_value':bz_value
+        },function (ret) {
+            document.getElementById('bz').style.display = 'none';
+        })
+    }
+    function close_bz() {
+        document.location.reload();
+    }
+</script>
+
+{# 异常值调试 #}
+<div id="error_div" style="display: none;border-radius: 5px;width: 80%;position: absolute;left: 10%;
+top:10%;background-color: #3c4043;box-shadow: 4px 4px 8px grey;color:white;padding-left: 10px">
+
+    <div class="btn-group" style="outline: none;float: right;">
+        <button onclick="error_play()" type="button" class="btn btn-success" style="outline: none">开始测试</button>
+        <button onclick="error_close()" type="button" class="btn btn-default" style="outline: none">关闭</button>
+    </div>
+
+    <h4>接口：<small style="color: #0dff00" id="error_api_name"></small>的异常值测试结果如下：</h4>
+
+    <stong>待替换数据：（用英文逗号隔开）</stong>
+    <input id="ready_error_data" type="text" style="color: black;border-radius: 5px;width: 99%;outline: none"
+    value="'a',123,'',' ','./?*&^','中文'"> <br><br>
+
+</div>
+
+<input type="text" style="display: none;outline: none" id="error_api_body">
+
+{# 全局请求头 #}
+<div id="project_header_div" style="display: none;border-radius:5px;width: 70%;height: 70%;
+position: absolute;left: 15%;top: 15%;box-shadow: 4px 4px 8px grey;
+padding-left: 10px;background-color: white">
+    <div class="btn-group" style="float: right;">
+        <button onclick="project_header_save()" type="button" class="btn btn-success">保存</button>
+        <button onclick="project_header_close()" type="button" class="btn btn-default">取消</button>
+    </div>
+    <h4>请设置本项目的全局公共请求头：</h4>
+    <div id="header_plan">
+        {% for i in project_header %}
+            <input type="text" name="header_id" value="{{i.id}}" style="display: none">
+            <input type="text" name="header_name" value="{{ i.name }}" style="width: 20%;margin-top: 3px" placeholder="请求头name"> = {"
+            <input type="text" name="header_key" value="{{ i.key }}" style="width: 15%" placeholder="请求头key"> " : "
+            <input type="text" name="header_value" value="{{ i.value }}" style="width: 50%" placeholder="请求头value"> "}
+            <br>
+        {% endfor %}
+    </div>
+    <br>
+    <button onclick="add_project_header()">新增</button>
+
+</div>
+<script>
+    function project_header_div_show() {
+        document.getElementById('project_header_div').style.display = 'block';
+    }
+    function project_header_close() {
+        document.location.reload()
+    }
+    function add_project_header() {
+        var header_plan = document.getElementById('header_plan');
+        var i0 = document.createElement('input');
+        i0.name = 'header_id';
+        i0.value = 'new';
+        i0.style.display='none';
+        var i1 = document.createElement('input');
+        i1.style='width: 20%;margin-top: 3px';
+        i1.placeholder='请求头name';
+        i1.name='header_name';
+        var i2 = document.createElement('input');
+        i2.style='width: 15%';
+        i2.placeholder='请求头key';
+        i2.name='header_key';
+        var i3 = document.createElement('input');
+        i3.style='width: 50%';
+        i3.placeholder='请求头value';
+        i3.name='header_value';
+        header_plan.appendChild(i0);
+        header_plan.appendChild(i1);
+        header_plan.appendChild(document.createTextNode(' = {" '));
+        header_plan.appendChild(i2);
+        header_plan.appendChild(document.createTextNode(' " : " '));
+        header_plan.appendChild(i3);
+        header_plan.appendChild(document.createTextNode(' "}'));
+        header_plan.appendChild(document.createElement("br"));
+    }
+    function project_header_save() {
+        var names = document.getElementsByName('header_name');
+        var keys = document.getElementsByName('header_key');
+        var values = document.getElementsByName('header_value');
+        var ids = document.getElementsByName('header_id');
+        var req_names= [];
+        var req_keys=[];
+        var req_values=[];
+        var req_ids=[];
+        for(var i=0;i<names.length;i++){
+            req_names.push(names[i].value);
+            req_keys.push(keys[i].value);
+            req_values.push(values[i].value);
+            req_ids.push(ids[i].value);
+        }
+        $.get('/save_project_header/',{
+            "project_id":"{{ project.id }}",
+            "req_names":req_names.toString(),
+            "req_keys":req_keys.toString(),
+            "req_values":req_values.toString(),
+            "req_ids":req_ids.toString(),
+        },function (ret) {
+            document.location.reload();
+        })
+    }
+</script>
+{# 环境变量目录 #}
+<div id="project_host_folder" style="display: none;border-radius:5px;width: 45%;height: 50%;
+position: absolute;left: 25%;top: 20%;box-shadow: 4px 4px 8px grey;
+padding-left: 10px;background-color: white">
+    <h4>MANAGE ENVIRONMENTS</h4>
+    <img src="/static/no.png" style="width: 20px; float:right; margin-top:-33px; margin-right:7px;" onclick="open_folder_host()">
+    <img src="/static/add_folder.png" style="width: 23px;margin-left: 33%;margin-top: -7%;" onclick="add_host_folder()">
+    <div id="h_folders" style="height:80%;margin-left:15px;width:95%;overflow-y: scroll;">
+        {% for i in project_host_folders %}
+            <div>
+                <div style="margin-top:10px;">
+                    <input id="host_f_inp{{ i.id }}" disabled="true" style="width: 35%" value="{{i.name}}" />
+                    <img src="/static/into.png" style="width: 19px;margin-left: 49%;margin-top: 6px" title="进入" onclick="open_host({{ i.id }})">
+                    <img src="/static/edit.png" style="width: 20px;margin-left: 2%;margin-top: 6px"onclick="edit_host_folder({{ i.id }})" id="host_f_img{{ i.id }}" title="编辑">
+                    <img src="/static/no.png" style="width: 19px;margin-left: 2%;margin-top: 6px" onclick="del_host_folder({{i.id}})" title="删除">
+                </div>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+{#    <button style="float:right;margin-right:35px;margin-top: 14px;" onclick="add_host_folder()">新增</button>#}
+
+</div>
+
+{# 全局域名 #}
+<div id="project_host_div" style="display: none;border-radius:5px;width: 45%;height: 50%;
+position: absolute;left: 25%;top: 20%;box-shadow: 4px 4px 8px grey;
+padding-left: 10px;background-color: white">
+    <div class="btn-group" style="float: right">
+        <button onclick="project_host_save()" type="button" class="btn btn-success">保存</button>
+        <button onclick="javascript:document.getElementById('project_host_div').style.display='none'" type="button" class="btn btn-default">取消</button>
+    </div>
+    <h4>请设置本项目的全局公共请求头：</h4>
+    <div id="host_folder_id" style="display: none"></div>
+    <div id="host_plan" style="overflow-y: scroll;height: 78%;margin-top: 18px;">
+    </div>
+    <br>
+    <button onclick="add_project_host('')">新增</button>
+
+</div>
+<script>
+    var bu = ''
+    var last_id = 0
+    var last_type = ''
+    var pro = 0
+    function showDiv(type,project_id,id) {  //显示more
+        if (last_id!=0 & id!=last_id){
+            if (last_type=='folder'){
+                var last_more = document.getElementById('more_folder_page_'+last_id)
+            }else {
+                var last_more = document.getElementById('more_api_page_'+last_id)
+            }
+            last_more.style.display = "none";
+        }
+        pro = project_id
+        event.stopPropagation()?event.stopPropagation():event.cancelBubble = true
+        if (type=='folder'){
+            var more = document.getElementById('more_folder_page_'+id)
+            bu = more
+        }else {
+            var more = document.getElementById('more_api_page_'+id)
+            bu = more
+        }
+        if(more.style.display=="none"){
+            var Y = event.clientY-event.offsetY //获取点击按钮位置
+            var h = (more.style.height).split('px')[0]
+            if (window.innerHeight-(Y+30)<parseInt(h)){ //判断点击按钮是否超出浏览器边框
+                more.style.top = (Y-parseInt(h)).toString()+'px'; //加上点击按钮的height
+            }else {
+                more.style.top = (Y+30).toString()+'px'; //加上点击按钮的height
+            }
+            more.style.display = "block";
+            last_id = id
+            last_type = type
+
+            //当弹窗显示时，绑定scroll事件，禁用滚动条
+            var tops = $('#total'+project_id).scrollTop();
+            $('#total'+project_id).bind("scroll",function () {
+                $('#total'+project_id).scrollTop(tops);
+            })
+        }else {
+            more.style.display = "none";
+            $('#total'+project_id).unbind("scroll")
+        }
+
+    }
+    document.onclick=function(){//监听页面点击事情
+        if (bu){  //判断有点击事件时，关闭弹窗
+            hide(bu);
+        }
+    }
+    function open_folder_host() {
+        document.getElementById('project_host_folder').style.display="none";
+        document.getElementById('mengceng').style.display="none";
+    }
+
+    function hide(o){
+        o.style.display = "none";
+        if (pro){
+            $('#total'+pro).unbind("scroll")
+        }
+    }
+    function add_host_folder() {
+        var host_folder = document.getElementById('h_folders')
+        var div1 = document.createElement('div');
+        var div2 = document.createElement('div');
+        div1.appendChild(div2)
+        div2.style = "margin-top: 10px;"
+
+        var inp = document.createElement('input');
+        inp.id = 'new';
+        inp.style=" width: 35%;";
+        inp.disabled = "true";
+        var h = document.createElement('hr');
+        var i1 = document.createElement('img');
+        i1.src="/static/into.png";
+        i1.style="width: 19px;margin-left: 49%;margin-top: 6px;";
+        i1.title="进入";
+
+        var i2 = document.createElement('img')
+        {#i1.id = "host_f_i1"#}
+        i2.src = "/static/edit.png"
+        i2.style = "width: 20px;margin-left: 2%;margin-top: 6px;"
+        i2.onclick = function () {
+            if (inp.disabled==true){
+                inp.disabled = false
+                i2.src = "/static/yes.png"
+            }else {
+                if (inp.value==''){
+                    alert('输入框不可为空！')
+                    return;
+                }
+                inp.disabled = true
+                i2.src = "/static/edit.png"
+                if (inp.id=='new'){
+                    $.get('/add_host_folder/',{
+                        "project_id":"{{ project.id }}",
+                        "name":inp.value,
+                        "id":"",
+                    },function (ret) {
+                        inp.id='host_f_inp'+ret.id
+                        i1.onclick= function () {
+                            open_host(ret.id)
+                        }
+                        var category = document.getElementById('enVar')
+                        var opt = document.createElement('option')
+                        opt.value = ret.id
+                        opt.innerText = ret.name
+                        category.appendChild(opt)
+
+                    })
+                }else {
+                    $.get('/add_host_folder/',{
+                        "project_id":"{{ project.id }}",
+                        "name":inp.value,
+                        "id":inp.id.split('inp')[1],
+                    },function (ret) {
+                    })
+                }
+            }
+        }
+
+        var i3 = document.createElement('img')
+        i3.src = "/static/no.png"
+        i3.style = "width: 19px; margin-left:2%; margin-top:6px;"
+        i3.onclick = function (){
+            if (inp.value==''){
+                host_folder.removeChild(div1);
+                {#host_folder.removeChild(h);#}
+            }else{
+                del_host_folder(inp.id.split('inp')[1])
+            }
+        }
+
+        div2.appendChild(inp)
+        div2.appendChild(i1)
+        div2.appendChild(i2)
+        div2.appendChild(i3)
+        div1.appendChild(h)
+        host_folder.appendChild(div1)
+    }
+    function edit_host_folder(id) {
+        var inp = document.getElementById('host_f_inp'+id);
+        if (inp.value==''){
+            alert('输入框不可为空！')
+            return;
+        }
+        if (inp.disabled){
+            inp.removeAttribute("disabled");
+            document.getElementById('host_f_img'+id).src = "/static/yes.png";
+        }else {
+            inp.disabled = 'disabled';
+            document.getElementById('host_f_img'+id).src = "/static/edit.png";
+            $.get('/add_host_folder/',{
+                "project_id":"{{ project.id }}",
+                "name":inp.value,
+                "id":id,
+            },function (ret) {
+                var category = document.getElementById('enVar')
+                var ops = category.options
+                for (var i=0;i<ops.length;i++){
+                    if (ops[i].value ==id ){
+                        ops[i].innerText = inp.value;
+                    }
+                }
+            })
+        }
+
+    }
+    function del_host_folder(id) {
+        if (confirm("确定删除 "+document.getElementById('host_f_inp'+id).value+"?") == false){return}
+        inp = document.getElementById('host_f_inp'+id).parentNode.parentNode
+        inp.parentNode.removeChild(inp)
+        $.get('/del_host_folder/',{
+                "project_id":"{{ project.id }}",
+                "id":id,
+            },function (ret) {
+                var category = document.getElementById('enVar');
+                var ops = category.options;
+                for (var i=0;i<ops.length;i++){
+
+                    if (ops[i].value==id){
+                        category.removeChild(ops[i]);
+                    }
+                }
+            })
+    }
+    function open_host(id) {
+        var inp = document.getElementById('host_f_inp'+id);
+        //显示蒙层，并设置好蒙层的层级关系，让其1在调试层之下，其他元素之上
+        document.getElementById('project_host_div').style.zIndex='999';
+        document.getElementById('project_host_div').style.display = 'block';
+
+        document.getElementById('host_plan').innerText= '' //清除页面数据
+        document.getElementById('host_folder_id').innerText = id
+        $.get('/get_project_host/',{
+            "host_folder_id":id,
+        },function (ret) {
+             for (var i=0;i<ret.length;i++){
+                 add_project_host(ret[i])
+             }
+        })
+    }
+
+    function add_project_api(project_id,project_folder_id) {
+        if(project_folder_id){
+            document.getElementById('more_folder_page_'+project_folder_id).style.display = 'none';
+        }
+        //显示蒙层，并设置好蒙层的层级关系，让其1在调试层之下，其他元素之上
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('add_project_api').style.zIndex='999';
+
+        document.getElementById('add_project_api').style.display = 'block';
+        document.getElementById('api_name').value = ''
+        document.getElementById('api_des').value = ''
+        var x = document.getElementById('add_api_Y');
+        x.onclick = function () {
+            var api_name = document.getElementById('api_name').value;
+            if (!api_name){
+                alert('接口名称不可为空!')
+                return;
+            }
+            var api_des = document.getElementById('api_des').value;
+            $.ajax({
+                    url:'/project_api_add/',//访问的url地址
+                    data:{'project_id':project_id,'project_folder_id':project_folder_id,'api_name':api_name,'api_des':api_des,},
+                    success:function (data) {
+                        if(project_folder_id){
+                            var div_api_list = document.getElementById('apiList'+project_folder_id) ;
+                            var total = document.getElementById('total'+project_folder_id) ;
+                        }else {
+                            var div_api_list = document.getElementById('apiList'+project_id) ;
+                            var total = document.getElementById('total'+project_id) ;
+                        }
+                        if(total){
+                            show_api(data['api_list'],div_api_list)
+                        }
+                        document.getElementById('add_project_api').style.display = 'none';
+                        document.getElementById('mengceng').style.display='none';
+                    }
+            })
+        }
+    }
+    
+    function add_project_folder_div(project_id,id) {
+        if (id){
+            document.getElementById('more_folder_page_'+id).style.display = 'none';
+        }
+
+        //显示蒙层，并设置好蒙层的层级关系，让其1在调试层之下，其他元素之上
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('add_project_folder_div').style.zIndex='999';
+
+        document.getElementById('add_project_folder_div').style.display = 'block';
+        document.getElementById('project_folder_name').value = ''
+
+        var x = document.getElementById('add_folder_Y');
+        $("#add_folder_Y").unbind('click').bind('click',function () {
+            var project_folder_name = document.getElementById('project_folder_name').value
+            $.ajax({
+                url:'/project_fodler_add/',//访问的url地址
+                data:{'project_id':project_id,'id':id,'project_name':project_folder_name},
+                success:function (data) {
+                    if(id){
+                        var div_folder_list = document.getElementById('folderList'+id) ;
+                        var total = document.getElementById('total'+id) ;
+                    }else {
+                        var div_folder_list = document.getElementById('folderList'+project_id) ;
+                        var total = document.getElementById('total'+project_id) ;
+                    }
+                    if(total){
+                        folder_data = show_folder(data['folder_list'],div_folder_list)
+                    }
+                    document.getElementById('add_project_folder_div').style.display = 'none';
+                    document.getElementById('mengceng').style.display='none';
+                }
+            });
+        })
+    }
+    function delete_d(type,id,name) {
+        if (type=='folder'){
+            document.getElementById('more_folder_page_'+id).style.display = 'none';
+        }else {
+            document.getElementById('more_api_page_'+id).style.display = 'none';
+            document.getElementById('debug').style.display = 'none';
+        }
+        delete_type(type,id,name)
+    }
+
+    function delete_type(type,id,name) {
+        // document.getElementById('more_folder_'+id).style.display = 'none';
+        if (confirm("确定要删除 "+name+" ?") == false){return}
+        $.ajax({
+            url:'/delete/',//访问的url地址
+            data:{'type':type,'id':id},
+            success:function (data) {
+                if (type=="folder"){
+                    document.getElementById('folder'+id).style.display = 'none';
+                }else {
+                    document.getElementById('api'+id).style.display = 'none';
+                }
+                // var div_folder_list = document.getElementById('folderList'+id) ;
+                // folder_data = show_folder(data['folder_list'],parent)
+                // document.getElementById('edit_folder_div').style.display = 'none';
+                // document.getElementById('mengceng').style.display='none';
+            }
+        });
+    }
+    function rename_folder() {
+
+    }
+    function edit_folder(project_id,id,folder_name) {
+        document.getElementById('more_folder_page_'+id).style.display = 'none';
+        //显示蒙层，并设置好蒙层的层级关系，让其1在调试层之下，其他元素之上
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('edit_folder_div').style.zIndex='999';
+
+        document.getElementById('edit_folder_div').getElementsByTagName('input')[0].value = folder_name;
+        document.getElementById('edit_folder_div').style.display = 'block';
+        $(document).ready(function () {
+            $("#edit_folder_Y").unbind('click').bind('click',function () {
+                var project_folder_name = document.getElementById('edit_folder_div').getElementsByTagName('input')[0].value
+                $.ajax({
+                    url:'/project_fodler_edit/',//访问的url地址
+                    data:{'project_id':project_id,'id':id,'project_folder_name':project_folder_name},
+                    success:function (data) {
+                        var div_folder_list = document.getElementById('folder'+id) ;
+                        div_folder_list.getElementsByTagName('span')[0].innerText =project_folder_name
+                        document.getElementById('edit_folder_div').style.display = 'none';
+                        document.getElementById('mengceng').style.display='none';
+                    }
+                });
+            })
+        });
+
+    }
+    function edit_api(project_id,id,api_name) {
+        document.getElementById('more_api_page_'+id).style.display = 'none';
+        //显示蒙层，并设置好蒙层的层级关系，让其1在调试层之下，其他元素之上
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('edit_api_div').style.zIndex='999';
+
+        document.getElementById('edit_api_div').getElementsByTagName('input')[0].value = api_name;
+        document.getElementById('edit_api_div').style.display = 'block';
+        $(document).ready(function () {
+            $("#edit_api_Y").unbind('click').bind('click',function () {
+                var project_api_name = document.getElementById('edit_api_div').getElementsByTagName('input')[0].value
+                $.ajax({
+                    url:'/project_api_edit/',//访问的url地址
+                    data:{'project_id':project_id,'id':id,'project_api_name':project_api_name},
+                    success:function (data) {
+                        var div_api_list = document.getElementById('api'+id) ;
+                        div_api_list.getElementsByTagName('span')[1].innerText =project_api_name
+                        document.getElementById('edit_api_div').style.display = 'none';
+                        document.getElementById('mengceng').style.display='none';
+                    }
+                });
+            })
+        });
+
+    }
+    function project_host_close() {
+        document.location.reload()
+    }
+    function project_host_delete() {
+
+    }
+
+    function project_host_save() {
+        var names = document.getElementsByName('host_name');
+        var hosts = document.getElementsByName('host_host');
+        var ids = document.getElementsByName('host_id');
+        var req_names= [];
+        var req_hosts=[];
+        var req_ids=[];
+        for(var i=0;i<names.length;i++){
+            if (names[i].parentElement.style.display!='none'){
+                if (names[i].value==''|hosts[i].value==''){
+                    alert('name或host不能为空！')
+                    return
+                }else {
+                    req_names.push(names[i].value);
+                    req_hosts.push(hosts[i].value);
+                    req_ids.push(ids[i].value);
+                }
+            }
+        }
+        $.get('/save_project_host/',{
+            "host_folder_id":document.getElementById('host_folder_id').innerText,
+            "req_names":req_names.toString(),
+            "req_hosts":req_hosts.toString(),
+            "req_ids":req_ids.toString(),
+        },function (ret) {
+            document.getElementById('project_host_div').style.display='none';
+            {#mengceng_close('project_host_div')#}
+        })
+    }
+    function add_project_host(host) {
+        var host_plan = document.getElementById('host_plan');
+        var div = document.createElement('div')
+        host_plan.appendChild(div)
+        var i0 = document.createElement('input');
+        i0.name = 'host_id';
+        i0.style.display ='none';
+        var i1 = document.createElement('input');
+        i1.style='width: 20%;margin-top: 3px';
+        i1.placeholder='name';
+        i1.name='host_name';
+        var i2 = document.createElement('input');
+        i2.style='width: 70%';
+        i2.placeholder='host';
+        i2.name='host_host';
+        if (host){
+            i0.value = host['id'];
+            i1.value = host['name'];
+            i2.value = host['host'];
+        }else {
+            i0.value = 'new';
+        }
+        var but = document.createElement('button')
+        but.style = 'width:20px; height:18px;margin-left: 5px;border-style: none;outline: 0;'
+        but.appendChild(document.createTextNode('X'))
+        but.onclick = function () {
+            $(this).parent()[0].style.display = 'none';
+        }
+
+
+        div.appendChild(i0);
+        div.appendChild(i1);
+        div.appendChild(document.createTextNode(' = " '));
+        div.appendChild(i2);
+        div.appendChild(document.createTextNode(' "'));
+        div.appendChild(but)
+        div.appendChild(document.createElement("br"));
+    }
+</script>
+
+{# 登录态接口 #}
+<div id="login_set_div" style="display: none;border-radius: 5px;width: 80%;background-color: white;position: absolute;
+    left: 10%;top: 10%;box-shadow: 4px 4px 8px gray;padding-left: 10px;">
+    <div class="btn-group" style="float: right;padding: 1px;">
+        <button onclick="login_save()" type="button" class="btn btn-success" style="outline: none">保存</button>
+        <button onclick="login_close()" type="button" class="btn btn-default" style="outline: none">取消</button>
+    </div>
+    <h4>请设置该项目的登录态接口：</h4>
+    <ul class="nav navbar-nav" style="width: 98%;">
+        <li>
+            <select name="" id="login_method" style="height: 40px;" class="form-control">
+                <option value="none">请求方式</option>
+                <option value="post">POST</option>
+                <option value="get">GET</option>
+                <option value="put">PUT</option>
+                <option value="delete">DELETE</option>
+            </select>
+        </li>
+
+        <li style="width: calc(100% - 225px)">
+            <input id="login_url" style="color: black;padding-left: 10px;width: 100%;height: 40px;outline: none;" type="text"
+            placeholder="url：如 /abcd/efgh" value="">
+        </li>
+
+        <li>
+            <button onclick="login_send()" type="button" style="height: 40px;width: 120px;outline: none;" class="btn btn-default">
+                <span style="font-size: large;">Send</span>
+            </button>
+        </li>
+    </ul>
+    <br><br><br>
+    <ul class="nav navbar-nav" style="width: 98%">
+        <li style="width: 100%;">
+            <input type="text" list="datalist_1" autocomplete="off" id="login_host" style="color: black;padding-left: 10px;
+                width: 100%;height: 40px;outline: none;" placeholder="host：如http(s)://xxx.ccc.com" value="">
+        </li>
+    </ul>
+    <br><br><br>
+    <ul class="nav navbar-nav" style="width: 98%">
+        <li style="width: 100%;">
+            <input type="text" id="login_header" style="color: black;padding-left: 10px;width: 100%;height: 40px;outline: none;"
+            placeholder='header请求头：如{"content":"application/json"}' value="">
+        </li>
+    </ul>
+    <br><br><br>
+    <ul class="nav navbar-nav" style="width: 98%;">
+        <li>
+            <select name="" id="login_code" style="height: 40px;" class="form-control">
+                <option value="no">无验证码</option>
+                <option value="yes">有验证码</option>
+            </select>
+        </li>
+        <li style="width: calc(100% - 105px)">
+            <input id="login_code_url" style="color: black;padding-left: 10px;width: 100%;height: 40px;outline: none;" type="text"
+            placeholder="请输入生成code接口链接" value="">
+        </li>
+    </ul>
+    <br><br><br>
+    <ul id="login_myTab" class="nav nav-tabs" >
+<!--        <li class="active"><a id="login_click_none" href="#login_none" data-toggle="tab" >none</a></li>-->
+<!--        <li ><a href="#login_form-data" data-toggle="tab" >form-data</a></li>-->
+<!--        <li ><a href="#login_x-www-form-urlencoded" data-toggle="tab" >x-www-form-urlencoded</a></li>-->
+<!--        <li class="dropdown">-->
+<!--            <a href="#" class="dropdown-toggle" data-toggle="dropdown">raw <b class="caret"></b></a>-->
+<!--            <ul class="dropdown-menu" role="menu" aria-labelledby="login_myTabDrop1">-->
+<!--                <li><a href="#login_Text" tabindex="-1" data-toggle="tab">Text</a></li>-->
+<!--                <li><a href="#login_JavaScript" tabindex="-1" data-toggle="tab">JavaScript</a></li>-->
+<!--                <li><a href="#login_Json" tabindex="-1" data-toggle="tab">Json</a></li>-->
+<!--                <li><a href="#login_Html" tabindex="-1" data-toggle="tab">Html</a></li>-->
+<!--                <li><a href="login_#Xml" tabindex="-1" data-toggle="tab">Xml</a></li>-->
+<!--            </ul>-->
+<!--        </li>-->
+        <!-- 目标平台不使用GraphQL，先注释掉 <li ><a href="#login_GraphQL" data-toggle="tab" >GraphQL</a> </li> -->
+        <li><a href="#login_Json" tabindex="-1" data-toggle="tab">请求体-Json</a></li>
+        <li ><a href="#login_response" data-toggle="tab" >返回体</a></li>
+    </ul>
+    <div id="login_myTabContent" class="tab-content">
+<!--        <div class="tab-pane fade in active" id="login_none" style="text-align: center;color: grey">-->
+<!--            <h3>这个请求将不会携带任何请求体</h3>-->
+<!--            <h5>This request will not carry any request-body</h5>-->
+<!--        </div>-->
+<!--        <div class="tab-pane fade" id="login_form-data">-->
+<!--            <div class="table-responsive" style="width: 98%;color: black">-->
+<!--                <table class="table table-bordered table-striped" id="login_mytable" style="background-color:white">-->
+<!--                    <thead style="color: #337ab7;font-size: x-small">-->
+<!--                      <tr>-->
+<!--                        <td style="width: 30%">Key</td>-->
+<!--                        <td style="width: 50%">Value</td>-->
+<!--                      </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody id="login_mytbody">-->
+<!--                      <tr>-->
+<!--                        <td></td>-->
+<!--                        <td></td>-->
+<!--                      </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--            <button class="btn btn-default" id="login_add"><i class="fa fa-plus"></i> 添加新参数</button>-->
+<!--            <script>window.jQuery || document.write('<script src="/static/201801271505/js/jquery-1.11.0.min.js"><\/script>')</script>-->
+<!--            <script type="text/javascript" src="/static/201801271505/js/bootstable.js"></script>-->
+<!--        </div>-->
+<!--        <div class="tab-pane fade" id="login_x-www-form-urlencoded">-->
+<!--            <div class="table-responsive" style="width: 98%;color: black">-->
+<!--                <table class="table table-bordered table-striped" id="login_mytable2" style="background-color:white">-->
+<!--                    <thead style="color: #337ab7;font-size: x-small">-->
+<!--                      <tr>-->
+<!--                        <td style="width: 30%">Key</td>-->
+<!--                        <td style="width: 50%">Value</td>-->
+<!--                      </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody id="login_mytbody2">-->
+<!--                      <tr>-->
+<!--                        <td></td>-->
+<!--                        <td></td>-->
+<!--                      </tr>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--            <button class="btn btn-default" id="login_add2"><i class="fa fa-plus"></i> 添加新参数</button>-->
+<!--            <script>window.jQuery || document.write('<script src="/static/201801271505/js/jquery-1.11.0.min.js"><\/script>')</script>-->
+<!--            <script type="text/javascript" src="/static/201801271505/js/bootstable.js"></script>-->
+<!--        </div>-->
+<!--        <div class="tab-pane fade" id="login_Text">-->
+<!--            <textarea name="" id="login_raw_Text" style="color: black;width: 98%;height: 300px"></textarea>-->
+<!--        </div>-->
+<!--        <div class="tab-pane fade" id="login_JavaScript">-->
+<!--            <textarea name="" id="login_raw_JavaScript" style="color: black;width: 98%;height: 300px"></textarea>-->
+<!--        </div>-->
+        <div class="tab-pane fade" id="login_Json">
+            <textarea name="" id="login_raw_Json" style="color: black;width: 98%;height: 300px"></textarea>
+        </div>
+<!--        <div class="tab-pane fade" id="login_Html">-->
+<!--            <textarea name="" id="login_raw_Html" style="color: black;width: 98%;height: 300px"></textarea>-->
+<!--        </div>-->
+<!--        <div class="tab-pane fade" id="login_Xml">-->
+<!--            <textarea name="" id="login_raw_Xml" style="color: black;width: 98%;height: 300px"></textarea>-->
+<!--        </div>-->
+<!--        <div class="tab-pane fade" id="login_GraphQL">-->
+<!--             <table style="width: 98%">-->
+<!--               <thead>-->
+<!--                    <tr>-->
+<!--                        <td style="width: 55%"><span >QUERY</span></td>-->
+<!--                        <td style="width: 40%"><span >GRAPHQL VARIABLES</span></td>-->
+<!--                      </tr>-->
+<!--               </thead>-->
+<!--                <tbody style="color: black">-->
+<!--                  <tr>-->
+<!--                    <td><textarea id="login_body_plan_G_Q"  rows="14" style="padding-left: 3px;border-radius: 5px;width: 99%"></textarea></td>-->
+<!--                    <td><textarea id="login_body_plan_G_G"  rows="14" style="padding-left: 3px;border-radius: 5px;width: 100%"></textarea></td>-->
+<!--                  </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--         </div>-->
+        <div class="tab-pane fade" id="login_response">
+            <ul class="nav navbar-nav" style="width: 98%">
+                <li style="width: 33%;">
+                    <textarea name="" id="login_response_body" disabled="disabled"
+                              style="background-color: #e4f3f5;color: black;width: 100%;height: 300px"
+                               placeholder="返回体"></textarea>
+                </li>
+                <li style="width: 33%;">
+                     <textarea name="" id="login_response_set"
+                              style="color: black;width: 100%;height: 300px"
+                               placeholder="若选用cookie持久化操作，请只输入cookie后保存。
+
+若想使用登录接口的返回字段，请输入提取设置，=号左边写变量名，右边写绝对路径，多个用换行分开，格式例如：
+            sessId=/content/sessId
+            token=/data/token"></textarea>
+                </li>
+                <li style="width: 33%;">
+                     <textarea name="" id="login_response_result" disabled="disabled"
+                              style="background-color: #f5eeec;color: black;width: 100%;height: 300px"
+                               placeholder="提取结果"></textarea>
+
+                </li>
+            </ul>
+        </div>
+    </div>
+    <br>
+</div>
+<script>
+    function ts_show(id) {
+        // clear_ts_api()
+        document.getElementById('debug').style.display = 'block';
+        document.getElementById('ts_api_id').innerText = id;
+        $.get('/get_api_data/',{
+            'api_id':id,
+        },function (ret) {
+            document.getElementById('ts_api_name').value = ret.name;
+            if (ret.api_method == null) {
+                document.getElementById('ts_method').value = 'none';
+            } else {
+                document.getElementById('ts_method').value = ret.api_method;
+            }
+            if (ret.body_method == 0) {
+                $("[name='body']").get(ret.body_method).checked = true;
+                document.getElementById('none').style.display = 'block';
+                document.getElementById('raw').style.display = 'none';
+                document.getElementById('raw_data').style.display = 'none';
+            }
+            if (ret.body_method == 3) {
+                $("[name='body']").get(ret.body_method).checked = true;
+                document.getElementById('none').style.display = 'none';
+                document.getElementById('raw').style.display = 'inline';
+                document.getElementById('raw_data').style.display = 'block';
+                document.getElementById('raw_data').value = ret.api_body;
+            }
+            if (ret.body_method == null) {
+                $("[name='body']").get(0).checked = true;
+                document.getElementById('none').style.display = 'block';
+                document.getElementById('raw').style.display = 'none';
+                document.getElementById('raw_data').style.display = 'none';
+                document.getElementById('raw_data').value = '';
+            }
+            document.getElementById('ts_url').value = ret.api_url;
+
+            document.getElementById('mytbody2').innerHTML = '';
+            var headers = eval('(' + ret.api_header + ')')
+            for (i in headers) {
+                add_header(i, headers[i])
+            }
+
+            //公共请求头
+            if (ret.public_header != null) {
+                var project_headers = ret.public_header.split(',');
+                for (var i = 0; i < project_headers.length; i++) {
+                    try {
+                        document.getElementById('checkbox_' + project_headers[i]).checked = 'checked';
+                    } catch (e) {
+
+                    }
+                }
+            }
+        })
+    }
+    function login_show() {
+        //显示蒙层，并设置好蒙层的层级关系，让其在调试层之下，其他元素之上
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('login_set_div').style.zIndex='999';
+        document.getElementById('login_set_div').style.display = 'block';
+        $.get("/project_get_login/",{
+            "project_id":"{{ project.id }}"
+        },function (ret) {
+             // 运行第三方表格插件的函数：
+            // $('#login_mytable').SetEditable({
+            //     $addButton: $('#login_add'),
+            // });
+            // $('#login_mytable2').SetEditable({
+            //     $addButton: $('#login_add2'),
+            // });
+            if (JSON.stringify(ret) == "{}"){
+                document.getElementById('login_method').value = 'none';
+                $("li a[href=#login_Json]")[0].click();
+
+            }
+            else {
+                document.getElementById('login_method').value = ret.api_method;
+                document.getElementById('login_url').value = ret.api_url;
+                document.getElementById('login_host').value = ret.api_host;
+                document.getElementById('login_header').value = ret.api_header;
+                document.getElementById('login_response_set').value = ret.set;
+                document.getElementById('login_code').value = ret.code;
+                document.getElementById('login_code_url').value = ret.code_url;
+
+                // 请求体编码格式
+                // var body_method = '#login_'+ret.body_method;
+                $("li a[href=#login_Json]")[0].click();
+                document.getElementById('login_raw_Json').value = ret.api_body;
+                // 请求体显示
+                // if(ret.body_method == 'Text'){
+                //     document.getElementById('login_raw_Text').value = ret.api_body;
+                // }
+                // if(ret.body_method == 'JavaScript'){
+                //     document.getElementById('login_raw_JavaScript').value = ret.api_body;
+                // }
+                // if(ret.body_method == 'Json'){
+                //     document.getElementById('login_raw_Json').value = ret.api_body;
+                // }
+                // if(ret.body_method == 'Html'){
+                //     document.getElementById('login_raw_Html').value = ret.api_body;
+                // }
+                // if(ret.body_method == 'Xml'){
+                //     document.getElementById('login_raw_Xml').value = ret.api_body;
+                // }
+                // if(ret.body_method == 'form-data'){
+                //     var tbody = document.getElementById('login_mytbody'); // 定位表格中的tbody部分
+                //     body = eval(ret.api_body); //把这个像列表的字符串请求体变成真正的列表
+                //     for(var i=0;i<body.length;i++){ // 遍历这个请求体列表
+                //         key = body[i][0]; //拿出每一个键值对的key
+                //         value = body[i][1];//拿出每一个键值对的value
+                //         var childs_tr = tbody.children ;//获取到这个表格下面所有的tr组成的大列表
+                //         // 每个tr下的children得到的是 td列表，只有俩个。
+                //         childs_tr[i].children[0].innerText = key; //第一个td放key
+                //         childs_tr[i].children[1].innerText = value;//第二个td放value
+                //         //判断是否是最后一次遍历，来决定是否点击新增参数按钮
+                //         if(i<body.length-1){
+                //             document.getElementById('login_add').click()
+                //         }
+                //     }
+                // }
+                // if(ret.body_method == 'x-www-form-urlencoded'){
+                //     var tbody = document.getElementById('login_mytbody2'); // 定位表格中的tbody部分
+                //     body = eval(ret.api_body); //把这个像列表的字符串请求体变成真正的列表
+                //     for(var i=0;i<body.length;i++){ // 遍历这个请求体列表
+                //         key = body[i][0]; //拿出每一个键值对的key
+                //         value = body[i][1];//拿出每一个键值对的value
+                //         var childs_tr = tbody.children ;//获取到这个表格下面所有的tr组成的大列表
+                //         // 每个tr下的children得到的是 td列表，只有俩个。
+                //         childs_tr[i].children[0].innerText = key; //第一个td放key
+                //         childs_tr[i].children[1].innerText = value;//第二个td放value
+                //         //判断是否是最后一次遍历，来决定是否点击新增参数按钮
+                //         if(i<body.length-1){
+                //             document.getElementById('login_add2').click()
+                //         }
+                //     }
+                // }
+                // if(ret.body_method == "GraphQL"){
+                //     body_plan_G_Q =  ret.api_body.split('*WQRF*')[0];
+                //     body_plan_G_G =  ret.api_body.split('*WQRF*')[1];
+                //     document.getElementById('login_body_plan_G_Q').value =body_plan_G_Q;
+                //     document.getElementById('login_body_plan_G_G').value = body_plan_G_G;
+                // }
+            }
+
+        })
+    }
+    function login_close() {
+        document.getElementById('login_set_div').style.display='none';
+        document.getElementById('mengceng').style.display='none';
+    }
+    function login_save(){
+        // 获取所有接口设置数据
+        var login_method = document.getElementById('login_method').value ;
+        var login_url = document.getElementById('login_url').value ;
+        var login_host = document.getElementById('login_host').value ;
+        var login_header = document.getElementById('login_header').value ;
+        var login_response_set = document.getElementById('login_response_set').value;
+        var login_code = document.getElementById('login_code').value;
+        var login_code_url = document.getElementById('login_code_url').value;
+
+        // 判断顶部的数据是否填充完
+        if(ts_method == 'none'){alert('请选择请求方式！');return}
+        if(ts_url == ''){alert('请输入url！');return}
+        if(ts_host == ''){alert('请输入host！');return}
+        if(login_code == 'yes'){
+            if (login_code_url == ''){alert('请输入code生成链接！');return}
+        }
+
+        //判断关键数据是否符合规则
+        if(login_host.slice(0,7) != 'http://' && login_host.slice(0,8) != 'https://' && login_host.slice(0,4) !='全局域名' ){
+            alert('host必须以http://或https://开头！');return
+        }
+        if(login_header != ''){
+            try {
+                JSON.parse(login_header)
+            }catch (e) {
+                alert('header请求头不符合json规范！');
+                return
+            }
+        }
+        var login_api_body = document.getElementById('login_raw_Json').value;
+        // var login_bady_method = 'Json'
+        // var login_body_method = $('ul#login_myTab li[class="active"]')[0].innerText;
+        // if(login_body_method == '返回体'){
+        //     alert('请切换到请求体tab再保存！')
+        //     return
+        // }
+        //
+        // if(login_body_method == 'none'){
+        //     var login_api_body = ''
+        // }
+        // if(login_body_method == 'form-data'){
+        //     var login_api_body = []; //新建这个空列表用来存放后续的数据
+        //     var tbody_ = $("table#login_mytable tbody")[0]; //获取该表格的内容部分
+        //     var trlist = tbody_.children ; //获取下面所有tr，每个tr就是一个键值对实际上
+        //     for(var i=0;i<trlist.length;i++) {
+        //         var tdarr = trlist[i].children; // 获取tr下的俩个td
+        //         var key = tdarr[0].innerText; // 获取key
+        //         var value = tdarr[1].innerText; // 获取value
+        //         login_api_body.push([key, value]);// 作为一个数组，存放到这个大数组里。
+        //     }
+        //     var login_api_body = JSON.stringify(login_api_body);
+        // }
+        // if(login_body_method == 'x-www-form-urlencoded'){
+        //     var login_api_body = []; //新建这个空列表用来存放后续的数据
+        //     var tbody_ = $("table#login_mytable2 tbody")[0]; //获取该表格的内容部分
+        //     var trlist = tbody_.children ; //获取下面所有tr，每个tr就是一个键值对实际上
+        //     for(var i=0;i<trlist.length;i++) {
+        //         var tdarr = trlist[i].children; // 获取tr下的俩个td
+        //         var key = tdarr[0].innerText; // 获取key
+        //         var value = tdarr[1].innerText; // 获取value
+        //         login_api_body.push([key, value]);// 作为一个数组，存放到这个大数组里。
+        //     }
+        //     var login_api_body = JSON.stringify(login_api_body);
+        // }
+        // if(login_body_method == 'Text'){
+        //     var login_api_body = document.getElementById('login_raw_Text').value;
+        // }
+        // if(login_body_method == 'JavaScript'){
+        //     var login_api_body = document.getElementById('login_raw_JavaScript').value;
+        // }
+        // if(login_body_method == 'Json'){
+        //     var login_api_body = document.getElementById('login_raw_Json').value;
+        // }
+        // if(login_body_method == 'Html'){
+        //     var login_api_body = document.getElementById('login_raw_Html').value;
+        //
+        // }
+        // if(login_body_method == 'Xml'){
+        //     var login_api_body = document.getElementById('login_raw_Xml').value;
+        // }
+        // if(login_body_method == 'GraphQL'){
+        //     body_plan_G_Q = document.getElementById('login_body_plan_G_Q').value;
+        //     body_plan_G_G = document.getElementById('login_body_plan_G_G').value;
+        //      var login_api_body = body_plan_G_Q+ '*WQRF*' + body_plan_G_G
+        // }
+
+        $.get('/project_login_save/',{
+            'project_id':'{{ project.id }}',
+            'login_method':login_method,
+            'login_url':login_url,
+            'login_host':login_host,
+            'login_header':login_header,
+            'login_body_method':'Json',
+            'login_api_body':login_api_body,
+            'login_response_set':login_response_set,
+            'code':login_code,
+            'code_url':login_code_url,
+        },function (ret) {
+            document.location.reload();
+        })
+    }
+    function login_send() {
+        // 获取接口的所有数据
+        var login_method = document.getElementById('login_method').value ;
+        var login_url = document.getElementById('login_url').value ;
+        var login_host = document.getElementById('login_host').value ;
+        var login_header = document.getElementById('login_header').value ;
+        var login_response_set = document.getElementById('login_response_set').value;
+        var login_code = document.getElementById('login_code').value;
+        var login_code_url = document.getElementById('login_code_url').value;
+
+         // 判断顶部的数据是否填充完
+        if(login_method == 'none'){alert('请选择请求方式！');return}
+        if(login_url == ''){alert('请输入url！');return}
+        if(login_host == ''){alert('请输入host！');return}
+        if(login_code == 'yes'){
+            if (login_code_url == ''){alert('请输入code生成链接！');return}
+        }
+
+
+         //判断关键数据是否符合规则
+        if(login_host.slice(0,7) != 'http://' && login_host.slice(0,8) != 'https://' && login_host.slice(0,4) !='全局域名'){
+            alert('host必须以http://或https://开头！');return
+        }
+        if(login_header != ''){
+            try {
+                JSON.parse(login_header)
+            }catch (e) {
+                alert('header请求头不符合json规范！');
+                return
+            }
+        }
+        var login_api_body = document.getElementById('login_raw_Json').value;
+        // var login_body_method = $('ul#login_myTab li[class="active"]')[0].innerText;
+        // if(login_body_method == '返回体'){
+        //         alert('请切换到请求体tab再保存！');
+        //         return
+        //     }
+        //
+        // if(login_body_method == 'none'){
+        //     var login_api_body = ''
+        // }
+        // if(login_body_method == 'form-data'){
+        //     var login_api_body = []; //新建这个空列表用来存放后续的数据
+        //     var tbody_ = $("table#login_mytable tbody")[0]; //获取该表格的内容部分
+        //     var trlist = tbody_.children ; //获取下面所有tr，每个tr就是一个键值对实际上
+        //     for(var i=0;i<trlist.length;i++) {
+        //         var tdarr = trlist[i].children; // 获取tr下的俩个td
+        //         var key = tdarr[0].innerText; // 获取key
+        //         var value = tdarr[1].innerText; // 获取value
+        //         login_api_body.push([key, value]);// 作为一个数组，存放到这个大数组里。
+        //     }
+        //     login_api_body = JSON.stringify(login_api_body);
+        // }
+        // if(login_body_method == 'x-www-form-urlencoded'){
+        //     var login_api_body = []; //新建这个空列表用来存放后续的数据
+        //     var tbody_ = $("table#login_mytable2 tbody")[0]; //获取该表格的内容部分
+        //     var trlist = tbody_.children ; //获取下面所有tr，每个tr就是一个键值对实际上
+        //     for(var i=0;i<trlist.length;i++) {
+        //         var tdarr = trlist[i].children; // 获取tr下的俩个td
+        //         var key = tdarr[0].innerText; // 获取key
+        //         var value = tdarr[1].innerText; // 获取value
+        //         login_api_body.push([key, value]);// 作为一个数组，存放到这个大数组里。
+        //     }
+        //     login_api_body = JSON.stringify(login_api_body);
+        // }
+        // if(login_body_method == 'Text'){
+        //     var login_api_body = document.getElementById('login_raw_Text').value;
+        // }
+        // if(login_body_method == 'JavaScript'){
+        //     var login_api_body = document.getElementById('login_raw_JavaScript').value;
+        // }
+        // if(login_body_method == 'Json'){
+        //     var login_api_body = document.getElementById('login_raw_Json').value;
+        // }
+        // if(login_body_method == 'Html'){
+        //     var login_api_body = document.getElementById('login_raw_Html').value;
+        // }
+        // if(login_body_method == 'Xml'){
+        //     var login_api_body = document.getElementById('login_raw_Xml').value;
+        // }
+        //
+        // if(login_body_method == 'GraphQL'){
+        //     body_plan_G_Q = document.getElementById('login_body_plan_G_Q').value;
+        //     body_plan_G_G = document.getElementById('login_body_plan_G_G').value;
+        //      var login_api_body = body_plan_G_Q+ '*WQRF*' + body_plan_G_G
+        // }
+
+         $.get('/project_login_send/',{
+            'login_method':login_method,
+            'login_url':login_url,
+            'login_host':login_host,
+            'login_header':login_header,
+            'login_body_method':'Json',
+            'login_api_body':login_api_body,
+            'login_response_set':login_response_set,
+            'code':login_code,
+            'code_url':login_code_url,
+        },function (ret) {
+            $("li a[href=#login_response]")[0].click(); //点击一下返回体按钮
+            ret = eval(ret);
+            document.getElementById('login_response_body').value = ret.response ;//把返回值显示到返回值多行文本框中
+            document.getElementById('login_response_result').value = ret.get_res ; //把提取结果也展示在对应的文本框中
+        })
+    }
+</script>
+<div id="mengceng" style="display: none;opacity:0.5;position: absolute;left: 0;top: 0px;
+                          background-color: gray;width: 100%">
+</div>
+<script>
+    function error_show_response(span_text,ret) {
+        var error_div = document.getElementById('error_div'); // 声明这个请求体展示窗口
+        var s = document.createElement('span'); //创造替换标题
+        s.innerText = span_text;
+
+        var t = document.createElement('textarea'); //传教替换内容多行文本
+        t.style = 'width: 99%;height: 50px;border-radius: 5px;color: black;margin-bottom: 10px';
+        t.value = ret;
+
+        error_div.appendChild(s);
+        error_div.appendChild(t);
+    }
+    function error_play() {
+        api_body =document.getElementById('error_api_body').value;
+        ready_error_data = document.getElementById('ready_error_data').value;
+        api_id = document.getElementById('error_api_name').innerText;
+        //把预替换数据从一个大字符串，按逗号解析成数组。
+        var r = ready_error_data.split(',');
+
+        //判断是不是form-data/x-www...的二维数组格式
+        try {
+            var s = eval(api_body);
+            if (s instanceof Array){
+                for (var i=0;i<s.length;i++){//第一层，判断一共请求体有几个参数就进行几次大循环
+                    for (var j=0;j<r.length;j++){
+                        var new_body = []; //我们不能再s本尊上来回替换，所以弄了个替身，这个替身参与每次新的参数循环，都会重新被赋值原始s
+                        $.extend(true,new_body,s);
+                        new_body[i][1] = eval(r[j]);
+
+                        var span_text = '替换：'+new_body[i][0]+'-->'+r[j];
+
+                        $.get('/error_request/',{
+                            'api_id':api_id,
+                            'new_body':JSON.stringify(new_body),
+                            'span_text':span_text
+                        },function (ret) {
+                            error_show_response(ret.span_text,ret.response);
+                        })
+                    }
+                }
+            }else {
+                alert('当前请求体不含任何内容！');
+            }
+        }catch (e) {
+            //若不是，就继续判断是不是raw-json的json串格式
+            try {
+                var s = JSON.parse(api_body);
+                for (var i in s){
+                    for (var j=0;j<r.length;j++){
+                        var new_body = {};
+                        $.extend(true,new_body,s);
+                        new_body[i] = eval(r[j]);
+
+                        var span_text = '替换：'+i+'-->'+r[j];
+
+                        $.get('/error_request/',{
+                            'api_id':api_id,
+                            'new_body':JSON.stringify(new_body),
+                            'span_text':span_text
+                        },function (ret) {
+                            error_show_response(ret.span_text,ret.response)
+                        })
+                    }
+                }
+            }catch (e) {
+                //若也不是，那就不需要做异常值测试了
+                alert('当前接口的请求体类型不支持异常值测试！')
+            }
+        }
+    }
+
+    function error_test(api_id) {
+        var api_body = document.getElementById('api_error_'+api_id).value;
+        //显示蒙层，并设置好蒙层的层级关系，让其1在调试层之下，其他元素之上
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('error_div').style.zIndex='999';
+        error_clean();
+        document.getElementById('error_div').style.display = 'block';
+        document.getElementById('error_api_name').innerText = api_id;
+        document.getElementById('error_api_body').value = api_body;
+    }
+    function error_close() {
+        document.location.reload()
+    }
+    function error_clean() {
+        document.getElementById('error_div').innerHTML = '<div class="btn-group" style="outline: none;float: right;">\n' +
+            '        <button onclick="error_play()" type="button" class="btn btn-success" style="outline: none">开始测试</button>\n' +
+            '        <button onclick="error_close()" type="button" class="btn btn-default" style="outline: none">关闭</button>\n' +
+            '    </div>\n' +
+            '\n' +
+            '    <h4>接口：<small style="color: #0dff00" id="error_api_name"></small>的异常值测试结果如下：</h4>\n' +
+            '\n' +
+            '    <stong>待替换数据：（用英文逗号隔开）</stong>\n' +
+            '    <input id="ready_error_data" type="text" style="color: black;border-radius: 5px;width: 99%;outline: none"\n' +
+            '    value="\'a\',123,\'\',\' \',\'./?*&^\',\'中文\'"> <br><br>'
+    }
+</script>
+<script>
+    function clear_ts_api() {
+        document.getElementById('ts_api_id').innerText='';
+        document.getElementById('ts_api_name').innerText='';
+        document.getElementById('ts_method').value='none';
+        document.getElementById('ts_url').innerText='';
+        // document.getElementById('ts_header').innerText='{}';
+        document.getElementById('ts_login').value = 'no';
+        //开始初始化请求体编码格式部分；
+        //document.getElementById('click_none').click();//点击none子标签
+        // document.getElementById('mytbody').innerHTML='<tr><td></td><td></td></tr>';
+        // document.getElementById('mytbody2').innerHTML='<tr><td></td><td></td></tr>';
+        // document.getElementById('raw_Text').value='';
+        // document.getElementById('raw_Javascript').value='';
+        // document.getElementById('raw_Json').value='';
+        // document.getElementById('raw_Html').value='';
+        // document.getElementById('raw_Xml').value='';
+        //返回体清空；
+        document.getElementById('ts_response_body').value='';
+        //运行第三方插件；
+        // $('#mytable').SetEditable({
+        //             $addButton: $('#add'),
+        //         });
+        // $('#mytable2').SetEditable({
+        //             $addButton: $('#add2'),
+        //         });
+    }
+
+        
+    function ts_close() {
+        document.location.reload();
+    }
+    function ts_send(type) {
+        //获取接口所有数据
+        var ts_method = document.getElementById('ts_method').value ;
+        var ts_url = document.getElementById('ts_url').value;
+        var api_name = document.getElementById('ts_api_name').value;
+        {#var ts_login = document.getElementById('ts_login').value;#}
+        var ts_body_type = 0
+        var patt = new RegExp(/\{\{[a-zA-Z0-9]+\}\}/g);
+
+        var ts_header = {};
+        var mytbody = document.getElementById('mytbody2').getElementsByTagName('tr')
+        for (var i=0;i<mytbody.length;i++){
+            if (mytbody[i].style.display!='none'){
+                var headers= mytbody[i].getElementsByTagName('td')
+                if (headers[0].childNodes[0].value!=''&headers[1].childNodes[0].value!=''){
+                    ts_header[headers[0].childNodes[0].value] = headers[1].childNodes[0].value
+                }else{
+                    alert('headers内Key或Values不能为空');
+                    return;
+                }
+            }
+        }
+        //判断顶部数据是否填充完整
+        if (ts_method == 'none'){alert('请选择请求方式！');return}
+        if (ts_url == ''){alert('请输入url！');return}
+        // if (ts_host == ''){alert('请输入host！');return}
+        //判断关键数据是否符合规则
+        if (ts_url.slice(0,7) !== 'http://' && ts_url.slice(0,8) !== 'https://' && !patt.test(ts_url)){
+            alert('url必须以http://或者https://开头');return
+        }
+        if (new RegExp(/\{\{[a-zA-Z0-9]+\}\}/).test(ts_url)){
+            $.ajax({
+                url:'/get_project_host/',//访问的url地址
+                async :false,//设置成同步
+                data:{'host_folder_id':$("#enVar").find("option:selected").val(),},
+                success:function (ret) {
+                    var url = document.getElementById('ts_url').value;
+                    for (var i=0;i<ret.length;i++){
+                        var ts_urls = url.match(patt)
+                        if (ts_urls){
+                            var name = '\{\{'+ret[i]['name']+'\}\}';
+                            for (var j=0;j<ts_urls.length;j++){
+                                if (name==ts_urls[j]){
+                                    url = url.replace(name,ret[i]['host'])
+                                }
+                            }
+                        }
+                    }
+                    ts_url = url
+                }
+            })
+        }
+        var body = document.getElementById('body').getElementsByTagName('input')
+        var ts_api_body = ''
+        for (var i;i<body.length;i++){
+            if (body[i].checked){
+                if (body[i].value=='none'){
+                    ts_body_type = 0
+                    ts_api_body = ''
+                }
+                if (body[i].value=='form-data'){
+                    alert(body[i].value+'暂未开放，请选择其他body类型')
+                    return;
+                }
+                if (body[i].value=='x-www-form-urlencoded'){
+                    alert(body[i].value+'暂未开放，请选择其他body类型')
+                    return;
+                }
+                if (body[i].value=='raw'){
+                    var raw = document.getElementById('raw');
+                    var raw_value = raw.options[raw.selectedIndex].value;
+                    ts_api_body = document.getElementById('raw_data').value;
+                    ts_body_type =3
+                }
+                if (body[i].value=='binary'){
+                    alert(body[i].value+'暂未开放，请选择其他body类型')
+                    return;
+                }
+                if (body[i].value=='GraphQL'){
+                    alert(body[i].value+'暂未开放，请选择其他body类型')
+                    return;
+                }
+            }
+        }
+        var api_id = document.getElementById('ts_api_id').innerText;//获取接口id
+        if (type=='send'){
+            // 发送请求给后台
+            $.get('/Api_send/',{
+                'api_id':api_id,
+                'ts_method':ts_method,
+                'ts_url':ts_url,
+                'ts_header':JSON.stringify(ts_header),
+                'ts_body_method':ts_body_type,
+                'ts_api_body':ts_api_body,
+                'api_name':api_name,
+                {#'ts_login':ts_login,#}
+                // 'ts_project_headers':ts_project_headers.toString()
+            },function (ret) {
+                $("li a[href=#response]")[0].click();//点击返回体
+                document.getElementById('ts_response_body').value = ret;
+            })
+        }
+        if (type=='save'){
+            $.get('/Api_save/',{
+                'api_id':api_id,
+                'ts_method':ts_method,
+                'ts_url':document.getElementById('ts_url').value,
+                'ts_header':JSON.stringify(ts_header),
+                'ts_body_method':ts_body_type,
+                'ts_api_body':ts_api_body,
+                'api_name':api_name,
+                {#'ts_login':ts_login,#}
+                // 'ts_project_headers':ts_project_headers.toString(),
+            },function (ret) {
+                //保存完成，修改左侧ts_method、api_name
+                document.getElementById('api'+api_id).getElementsByTagName('span')[0].innerText =ts_method+'\xa0\xa0'
+                document.getElementById('api'+api_id).getElementsByTagName('span')[1].innerText =api_name
+                // document.getElementById('debug').style.display='none';
+                // document.location.reload();
+            })
+        }
+    }
+    function copy_api(api_id) {
+        $.get('/copy_api',{
+            'api_id':api_id
+        },function (ret) {
+            document.location.reload();
+        })
+    }
+    function ts_clear_host() {
+        document.getElementById('ts_host').value='';
+    }
+    function ts_clear_header() {
+        document.getElementById('ts_header').value='';
+    }
+    function ts_show_project_header() {
+        document.getElementById('ts_project_header_li').style='block';
+    }
+</script>
+<script>
+    document.getElementById('total{{project.id}}').style.height = (document.documentElement.clientHeight-135).toString()+'px';
+    document.getElementById('mengceng').style.height=(window.screen.availHeight-104).toString()+'px';
+    document.getElementById('shu').style.height = (document.documentElement.clientHeight-135).toString()+'px';
+    document.getElementById('debug').style.width = (document.documentElement.clientWidth-document.getElementById('shu').getBoundingClientRect()['left']-10).toString()+'px';
+    document.getElementById('debug').style.height = (document.documentElement.clientHeight-135).toString()+'px';
+    function open_folder(project_id,id) {
+        var div_ff = document.getElementById('total'+id); //显示所有的目录和api
+        var div_id = document.getElementById('folder'+id); //单个目录
+        var img = div_id.getElementsByTagName('img')[0].src.split('/static/')[1];
+        // div_id.getElementsByTagName('span')[1].style.display = 'block';
+
+        $.get('/folder_api_list/',{
+            'project_id':project_id,
+            'id':id
+        },function (ret) {
+            var res = eval(ret);
+            var folder_list = res.folder_list;
+            var api_list = ret.api_list;
+            if (div_ff == null){
+                var div_total =document.createElement('div') ;//创建div标签 放入所有的目录和api
+                div_total.style= "display: block;margin-left: 10px;";
+                div_total.id = 'total'+id
+                div_id.appendChild(div_total)
+
+                var div_folder_list = document.createElement('div') ;//创建div标签 放入所有的目录
+                div_folder_list.id = 'folderList'+id
+                div_total.appendChild(div_folder_list)
+
+                var div_api_list = document.createElement('div') ;//创建div标签 放入所有的api
+                div_api_list.id = 'apiList'+id
+                div_total.appendChild(div_api_list)
+
+                show_folder(folder_list,div_folder_list)
+                show_api(api_list,div_api_list)
+
+                if (img=='Down_Arrow.png'){
+                    div_id.getElementsByTagName('img')[0].src = '/static/Right_Arrow.png'
+                }else {
+                    div_id.getElementsByTagName('img')[0].src = '/static/Down_Arrow.png'
+                }
+            }else {
+                if (div_ff.style.display== "block"){
+                    div_ff.style.display="none";
+                    div_id.getElementsByTagName('img')[0].src = '/static/Right_Arrow.png'
+                }else {
+                    div_id.getElementsByTagName('img')[0].src = '/static/Down_Arrow.png'
+                    div_ff.style.display= "block";
+                }
+            }
+         })
+    }
+    function show_folder(folder_list,div_folder_list) {
+        for(var i=0; i<folder_list.length;i++){
+            var div_folder2 = document.createElement('div') ;
+            div_folder2.id = 'folder'+folder_list[i]["id"]
+
+            var div_but =document.createElement('button') ;
+
+            div_but.style = "border-style:none;width: 203px;text-align: left;outline:0;background-color: white;word-break: keep-all;white-space: nowrap;overflow: hidden;text-overflow: ellipsis"
+            div_but.id = folder_list[i]["project_id"]+'_'+folder_list[i]["id"]
+            div_but.onclick = function () {
+                var div_id = $(this).attr('id')
+                var p_id = div_id.split('_')[0]
+                var f_id = div_id.split('_')[1]
+                open_folder(p_id,f_id)
+            }
+            var img1 = document.createElement('img')
+            img1.src = "/static/Right_Arrow.png"
+            img1.style = "width: 5%"
+            var img2 = document.createElement('img');
+            img2.src = "/static/folder.png"
+            img2.style = "width: 8%;margin: 0 6px;"
+            var sp = document.createElement('span');
+            sp.textContent =folder_list[i].name;
+
+            var sp_f_more = document.createElement('span');
+            var bu_f_more = document.createElement('button');
+            bu_f_more.id = 'more_folder_'+folder_list[i]["id"]
+            bu_f_more.title = 'View more actions';
+            bu_f_more.style = 'position: relative;border-style:none;outline:0;background-color: white; float: right;';
+            bu_f_more.innerText = 'more'
+            bu_f_more.onclick = function (){
+                var div_id = $(this).attr('id')
+                var id = div_id.split('_')[2]
+                var project_id = $(this).parent().prev()[0].id.split('_')[0]
+                showDiv('folder',project_id,id)
+            }
+            var div_f_more = document.createElement('div');
+            div_f_more.style = 'position: absolute;display:none; left: 220px; border-radius: 4px;z-index: 9999 ;box-shadow: grey 4px 4px 8px; width: 160px;height: 128px;background-color: rgb(238, 238, 238);'
+            div_f_more.id = 'more_folder_page_'+folder_list[i]['id']
+
+            var more_f_but2 = document.createElement('button');
+            more_f_but2.type = 'button';
+            more_f_but2.className = 'but but_oth';
+            more_f_but2.onclick = function () {
+                var project_id = $(this).parent().parent().prev()[0].id.split('_')[0]
+                var id = $(this).parent().parent().prev()[0].id.split('_')[1]
+                var name = $(this).parent().parent().prev().children()[2].innerHTML
+                edit_folder(project_id,id,name)
+            }
+            var f_img2 = document.createElement('img');
+            f_img2.src='/static/edit.png';
+            f_img2.style = 'width:19px;margin: 0px 9px;';
+            more_f_but2.appendChild(f_img2)
+            var edit = document.createTextNode('Edit')
+            more_f_but2.appendChild(edit)
+
+            var more_f_but3 = document.createElement('button');
+            more_f_but3.type = 'button';
+            more_f_but3.className = 'but but_oth';
+            more_f_but3.onclick = function () {
+                var project_id = $(this).parent().parent().prev()[0].id.split('_')[0]
+                var id = $(this).parent().parent().prev()[0].id.split('_')[1]
+                add_project_api(project_id,id)
+            }
+            var f_img3 = document.createElement('img');
+            f_img3.src='/static/add_file.png';
+            f_img3.style = 'width:19px;margin: 0px 9px;';
+            more_f_but3.appendChild(f_img3)
+            var Add_Req = document.createTextNode('Add Request')
+            more_f_but3.appendChild(Add_Req)
+
+            var more_f_but4 = document.createElement('button');
+            more_f_but4.type = 'button';
+            more_f_but4.className = 'but but_oth';
+            more_f_but4.onclick = function () {
+                var project_id = $(this).parent().parent().prev()[0].id.split('_')[0]
+                var id = $(this).parent().parent().prev()[0].id.split('_')[1]
+                add_project_folder_div(project_id,id)
+            }
+            var f_img4 = document.createElement('img');
+            f_img4.src='/static/add_folder.png';
+            f_img4.style = 'width:19px;margin: 0px 9px;';
+            more_f_but4.appendChild(f_img4)
+            var Add_Fol = document.createTextNode('Add Folder')
+            more_f_but4.appendChild(Add_Fol)
+
+            var more_f_but5 = document.createElement('button');
+            more_f_but5.type = 'button';
+            more_f_but5.className = 'but but_del';
+            more_f_but5.onclick = function (){
+                var id = $(this).parent().parent().prev()[0].id.split('_')[1]
+                var name = $(this).parent().parent().prev().children()[2].innerHTML
+                delete_d('folder',id,name)
+            }
+            var f_img5 = document.createElement('img');
+            f_img5.src='/static/del_project.png';
+            f_img5.style = 'width:19px;margin: 0px 9px;';
+            more_f_but5.appendChild(f_img5)
+            var del = document.createTextNode('Delete')
+            more_f_but5.appendChild(del)
+
+            div_f_more.appendChild(more_f_but2)
+            div_f_more.appendChild(more_f_but3)
+            div_f_more.appendChild(more_f_but4)
+            div_f_more.appendChild(more_f_but5)
+            sp_f_more.appendChild(div_f_more)
+            sp_f_more.appendChild(bu_f_more)
+
+            div_but.appendChild(img1)
+            div_but.appendChild(img2)
+            div_but.appendChild(sp)
+
+
+            div_folder2.appendChild(div_but);
+            div_folder2.appendChild(sp_f_more);
+            div_folder_list.appendChild(div_folder2);
+
+            //设置目录按钮长度= more按钮left-img1的left   img1是文件夹图表左侧的箭头
+            div_but.style.width =bu_f_more.getBoundingClientRect()['left'] - img1.getBoundingClientRect()['left']-4+'px'
+            }
+    }
+    function show_api(api_list,div_api_list) {
+        for(var i=0; i<api_list.length;i++){
+            var div_api = document.createElement('div') ;//创建div标签
+            div_api.id = 'api'+api_list[i]['id']
+
+            var div_but =document.createElement('button') ;
+            div_but.id = api_list[i]["project_id"]+'_'+api_list[i]["id"]
+            div_but.style = "border-style:none; width: 235px; text-align: left; outline:0;background-color: white;word-break: keep-all;white-space: nowrap;overflow: hidden;text-overflow: ellipsis"
+            div_but.onclick = function () {
+                var div_id = $(this).attr('id')
+                var id = div_id.split('_')[1]
+                ts_show(id)
+            }
+            var span1 = document.createElement('span') ;
+            span1.style = "color: #f0ad4e ;font-weight: bold";
+            span1.innerHTML = api_list[i].api_method+'&nbsp&nbsp';
+
+            var span2 = document.createElement('span') ;
+            span2.innerHTML = api_list[i].name;
+
+            div_but.appendChild(span1);
+            div_but.appendChild(span2);
+
+            var sp_f_more = document.createElement('span');
+            sp_f_more.style.float = 'right'
+            var bu_f_more = document.createElement('button');
+            sp_f_more.appendChild(bu_f_more)
+            bu_f_more.id = 'more_api_'+api_list[i]["id"]
+            bu_f_more.title = 'View more actions';
+            bu_f_more.style = 'position: relative;border-style:none;outline:0;background-color: white;';
+            bu_f_more.innerText = 'more'
+
+            var div_f_more = document.createElement('div');
+            sp_f_more.appendChild(div_f_more)
+            div_f_more.style = 'position: absolute;display:none; left: 220px; border-radius: 4px;z-index: 9999 ;box-shadow: grey 4px 4px 8px; width: 160px;height: 64px;background-color: rgb(238, 238, 238);'
+            div_f_more.id = 'more_api_page_'+api_list[i]['id']
+            bu_f_more.onclick = function (){
+                var div_id = $(this).attr('id')
+                var id = div_id.split('_')[2]
+                var project_id = $(this).parent().prev()[0].id.split('_')[0]
+                showDiv('api',project_id,id)
+            }
+
+            var more_f_but2 = document.createElement('button');
+            more_f_but2.type = 'button';
+            more_f_but2.className = 'but but_oth';
+            more_f_but2.onclick = function () {
+                var project_id = $(this).parent().parent().prev()[0].id.split('_')[0]
+                var id = $(this).parent().parent().prev()[0].id.split('_')[1]
+                var name = $(this).parent().parent().prev().children()[1].innerHTML
+                edit_api(project_id,id,name)
+            }
+            var img2 = document.createElement('img');
+            img2.src='/static/edit.png';
+            img2.style = 'width:19px;margin: 0px 9px;';
+            more_f_but2.appendChild(img2)
+            var edit = document.createTextNode('Edit')
+            more_f_but2.appendChild(edit)
+
+            var more_f_but5 = document.createElement('button');
+            more_f_but5.type = 'button';
+            more_f_but5.className = 'but but_del';
+            more_f_but5.onclick = function (){
+                var id = $(this).parent().parent().prev()[0].id.split('_')[1]
+                var name = $(this).parent().parent().prev().children()[1].innerHTML
+                delete_d('api',id,name)
+            }
+            var img5 = document.createElement('img');
+            img5.src='/static/del_project.png';
+            img5.style = 'width:19px;margin: 0px 9px;';
+            more_f_but5.appendChild(img5)
+            var del = document.createTextNode('Delete')
+            more_f_but5.appendChild(del)
+
+            div_f_more.appendChild(more_f_but2)
+            div_f_more.appendChild(more_f_but5)
+
+            div_api.appendChild(div_but);
+            div_api.appendChild(sp_f_more);
+
+            div_api_list.appendChild(div_api)
+            //设置目录按钮长度= more按钮left-img1的left   img1是文件夹图表左侧的箭头
+            div_but.style.width =bu_f_more.getBoundingClientRect()['left'] - span1.getBoundingClientRect()['left']-4+'px'
+        }
+    }
+    function mengceng_close(div) {
+        document.getElementById(div).style.display='none'
+        // document.getElementById('login_set_div').style.display='none';
+        document.getElementById('mengceng').style.display='none';
+    }
+</script>
+</body>
+</html>

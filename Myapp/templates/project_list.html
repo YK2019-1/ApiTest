@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>项目列表</title>
+
+</head>
+<body >
+
+<h3 style="padding-left: 10px;color: #353c48">项目列表：
+    <span style="font-size: small;color: grey;">
+        点击 <strong> <a href="#" onclick="add_project_div()">新增项目</a></strong>
+        即可创建属于您的新项目！
+    </span>
+</h3>
+
+
+<table class="table table-striped" width="100%" style="padding-left: 10px;table-layout: fixed;">
+    <thead>
+        <tr>
+            <th width="15%">项目名称</th>
+            <th width="12%">项目创建者</th>
+            <th width="45%">项目成员</th>
+            <th width="20%">备注</th>
+            <th >操作</th>
+        </tr>
+    </thead>
+
+    <tbody >
+    {% for i in projects %}
+        <tr>
+            <td>{{i.name}}</td><td>{{i.user}}</td><td style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" title="{{i.other_user}}">{{i.other_user}}</td><td>{{i.remark}}</td>
+            <td><img src="/static/into.png" style="width: 22px;margin-left: -8%;" title="进入" onclick="javascript:document.location.href='/apis/{{i.id}}'">
+                {% if i.user == user.username or user.username == 'admin' %}
+                    <img src="/static/del_project.png" style="width: 22px;margin-left: 2%;" title="删除" onclick="delete_project('{{i.id}}')">
+{#                    <button onclick="delete_project('{{i.id}}')" class="btn btn-danger" style="outline: none">删除</button>#}
+                {% endif %}
+            </td>
+        </tr>
+<!--        {% if i.name in pro %}-->
+<!--        <tr>-->
+<!--            <td>{{i.id}}</td><td>{{i.name}}</td><td>{{i.user}}</td><td>{{i.other_user}}</td><td>{{i.remark}}</td>-->
+<!--            <td><button onclick="javascript:document.location.href='/apis/{{i.id}}'" class="btn btn-success" style="outline: none">进入</button>-->
+<!--                <button onclick="delete_project('{{i.id}}')" class="btn btn-danger" style="outline: none">删除</button></td>-->
+<!--        </tr>-->
+<!--        {% endif %}-->
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+    function delete_project(id) {
+        if (confirm("确定要删除该项目么？") == false){return}
+        $.get('/delete/',{
+            'id':id,
+            'type':'project'
+        },function (ret) {
+            document.location.reload();
+        })
+    }
+</script>
+<div id="add_project_div" style="width: 50%;background-color: white;border: 1px solid black;position: absolute;
+    left: 25%;top: 100px;padding-left: 10px;box-shadow: 4px 4px 8px gray;border-radius: 5px;display: none">
+    <h3>项目名称：（最多100字）</h3>
+    <input id="project_name" type="text" placeholder="(必填) 请输入项目名称" style="width: 95%">
+    <br><br>
+    <button onclick="cancel_add_project()" class="btn btn-danger" style="outline: none">取消</button>
+    <button onclick="add_project()" class="btn btn-success" style="outline: none">确定</button>
+    <br><br>
+</div>
+<div id="mengceng" style="display: none;opacity:0.5;position: absolute;left: 0;top: 0px;
+                          background-color: gray;width: 100%">
+</div>
+<script>
+    document.getElementById('mengceng').style.height=(window.screen.availHeight-104).toString()+'px';
+    function add_project_div() {
+        //显示蒙层，并设置好蒙层的层级关系，让其1在调试层之下，其他元素之上
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('add_project_div').style.zIndex='999';
+        document.getElementById('add_project_div').style.display='block'
+    }
+    function cancel_add_project() {
+        document.getElementById('add_project_div').style.display='none';
+        document.getElementById('mengceng').style.display='none';
+    }
+    function add_project() {
+        project_name = document.getElementById('project_name').value;
+        console.log("project_name:"+project_name)
+        if (project_name){
+            $.get('/add_project/',{
+                'project_name':project_name,
+            },function (ret) {
+                document.location.reload();
+            })
+        }else {
+            alert('项目名不可为空！')
+            return;
+        }
+    }
+</script>
+</body>
+</html>

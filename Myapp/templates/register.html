@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/201908059658/js/jquery-1.11.0.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div style="box-shadow: 4px 4px 6px #2a262a;margin-left:-webkit-calc(50% + 250px);margin-top:250px;width:400px;background-color:white;opacity:0.8;border-radius:20px;text-align:center">
+        <br><br>
+        <strong><span style="font-size: xx-large;">接口测试平台</span></strong><br>
+        <span>欢迎使用</span><br><br>
+        <input id="username" type="text" class="login_input focus" placeholder="用户名"><br><br>
+        <input  id="password" type="password" class="login_input focus" placeholder="密码">
+        <br><br><br>
+        <button onclick="register()" style="width:75%;height:35px;border-radius:50px;background-color:#2222FF;color:white;font-size:large;outline:none;">注册</button>
+        <br><br>
+    </div>
+<script>
+    function register(){
+            username = document.getElementById('username').value;
+            password = document.getElementById('password').value;
+            $.get("/register_action/",{
+                "username":username,
+                "password":password
+            },function (ret){
+                if (ret == '成功'){
+                    alert('注册成功！');
+                    document.location.href = '/login/';
+                }else {
+                    alert(ret);
+                }
+            })
+        }
+</script>
+</body>
+</html>

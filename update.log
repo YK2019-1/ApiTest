@@ -1,0 +1,9 @@
+------2022.05.07-----
+1、优化图标样式；
+2、接口去掉登录态；
+3、修改全局域名 改为环境变量；
+4、优化环境变量入口；
+5、合并url、host为一个输入框，且支持{{}}变量；
+6、优化header、body样式布局
+7、优化header输入框为多参数表单列表
+8、优化body入参方式，增加none、form-data、x-www-form-urlencoded、raw、binary、GraphQL选项

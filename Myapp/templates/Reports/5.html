@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>接口测试平台测试报告:PS1/TS/TS1设备详情查询</title>
+    <meta name="generator" content="HTMLTestRunner 0.8.2"/>
+    <link rel="shortcut icon" href=" /static/images/favicon.ico" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    
+<style type="text/css" media="screen">
+body        { font-family: verdana, arial, helvetica, sans-serif; font-size: 80%; }
+table       { font-size: 100%; }
+pre         { white-space: pre-wrap; }
+
+/* -- heading ---------------------------------------------------------------------- */
+h1 {
+	font-size: 16pt;
+	color: #c35b6e;
+	padding-left: 60px;
+}
+.heading {
+    margin-top: 0ex;
+    margin-bottom: 1ex;
+}
+
+.heading .attribute {
+    margin-top: 1ex;
+    margin-bottom: 0;
+}
+
+.heading .description {
+    margin-top: 4ex;
+    margin-bottom: 6ex;
+}
+.wqrf_button {
+    border: 1px solid #28292c;
+    border-radius: 3px;
+    box-shadow: 2px 2px 12px #aeaeae;
+    width: 60px;
+}
+/* -- css div popup ------------------------------------------------------------------------ */
+a.popup_link {
+}
+
+a.popup_link:hover {
+    color: red;
+}
+
+.popup_window {
+    display: none;
+    position: relative;
+    left: 0px;
+    top: 0px;
+    /*border: solid #627173 1px; */
+    padding: 10px;
+    background: linear-gradient(to top, #fcf5e8, #e0e4ff);
+    border: 1px solid #ffffff;border-radius: 10px;box-shadow: 2px 2px 12px #aeaeae;
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
+    text-align: left;
+    font-size: 8pt;
+    width: 500px;
+}
+
+}
+/* -- report ------------------------------------------------------------------------ */
+#show_detail_line {
+    margin-top: 3ex;
+    margin-bottom: 1ex;
+}
+#result_table {
+    width: 80%;
+    border-collapse: collapse;
+    border: 1px solid #777;
+}
+#header_row {
+    font-weight: bold;
+    color: white;
+    background-color: #5d7768;
+}
+#result_table td {
+    border: 1px solid #777;
+    padding: 2px;
+}
+#total_row  { font-weight: bold; }
+.passClass  { background-color: #6c6; }
+.failClass  { background-color: #c60; }
+.errorClass { background-color: #c00; }
+.passCase   { color: #6c6; }
+.failCase   { color: #c60; font-weight: bold; }
+.errorCase  { color: #c00; font-weight: bold; }
+.hiddenRow  { display: none; }
+.testcase   { margin-left: 2em; }
+
+#div100 img{
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+#div100 img:hover{
+  transform: scale(7);
+  }
+
+/* -- ending ---------------------------------------------------------------------- */
+#ending {
+}
+
+</style>
+
+</head>
+<body style="background: linear-gradient(to right, #caeef3, #fff6fc);">
+<script language="javascript" type="text/javascript"><!--
+output_list = Array();
+
+/* level - 0:Summary; 1:Failed; 2:Passed 3:All*/
+function showCase(level) {
+    trs = document.getElementsByTagName("tr");
+    for (var i = 0; i < trs.length; i++) {
+        tr = trs[i];
+        id = tr.id;
+        if (id.substr(0,2) == 'ft') {
+            if (level==0) {
+                tr.className = 'hiddenRow';
+            }
+            else if (level==2)  {
+                tr.className = 'hiddenRow';
+            }
+            else {
+                tr.className = '';
+            }
+        }
+        if (id.substr(0,2) == 'pt') {
+            if (level == 0) {
+                tr.className = 'hiddenRow';
+            }
+            else if (level == 1) {
+                tr.className = 'hiddenRow';
+            }
+            else {
+                tr.className = ''
+            }
+        }
+    }
+}
+
+
+function showClassDetail(cid, count) {
+    var id_list = Array(count);
+    var toHide = 1;
+    for (var i = 0; i < count; i++) {
+        tid0 = 't' + cid.substr(1) + '.' + (i+1);
+        tid = 'f' + tid0;
+        tr = document.getElementById(tid);
+        if (!tr) {
+            tid = 'p' + tid0;
+            tr = document.getElementById(tid);
+        }
+        id_list[i] = tid;
+        if (tr.className) {
+            toHide = 0;
+        }
+    }
+    for (var i = 0; i < count; i++) {
+        tid = id_list[i];
+        if (toHide) {
+            document.getElementById('div_'+tid).style.display = 'none'
+            document.getElementById(tid).className = 'hiddenRow';
+        }
+        else {
+            document.getElementById(tid).className = '';
+        }
+    }
+}
+
+function bbbb(vu)
+{
+    window.location=vu;
+ }
+
+function showTestDetail(div_id){
+    var details_div = document.getElementById(div_id)
+    var displayState = details_div.style.display
+    // alert(displayState)
+    if (displayState != 'block' ) {
+        displayState = 'block'
+        details_div.style.display = 'block'
+    }
+    else {
+        details_div.style.display = 'none'
+    }
+}
+function showAllTest(){
+showCase(3);
+showAllTest0();
+}
+
+
+function showAllTest0(){
+    var x = document.getElementsByClassName("popup_window");
+    var i;
+    for (i=0;i<x.length;i++){
+        var displayState = x[i].style.display
+        if (displayState != 'block' ) {
+            displayState = 'block'
+            x[i].style.display = 'block'
+        }
+        else {
+            x[i].style.display = 'none'
+    }}
+}
+
+
+function html_escape(s) {
+    s = s.replace(/&/g,'&amp;');
+    s = s.replace(/</g,'&lt;');
+    s = s.replace(/>/g,'&gt;');
+    return s;
+}
+
+/* obsoleted by detail in <div>
+function showOutput(id, name) {
+    var w = window.open("", //url
+                    name,
+                    "resizable,scrollbars,status,width=800,height=450");
+    d = w.document;
+    d.write("<pre>");
+    d.write(html_escape(output_list[id]));
+    d.write("\n");
+    d.write("<a href='javascript:window.close()'>close</a>\n");
+    d.write("</pre>\n");
+    d.close();
+}
+*/
+--></script>
+
+<div class='heading'>
+<h1>报告标题: 用例描述 </h1>
+    <div style="border: 1px solid #ffffff;border-radius: 10px;box-shadow: 2px 2px 12px #aeaeae;padding-left: 30px;width: 500px">
+<p class='attribute'>接口自动化测试平台提供</p>
+<p class='attribute'><strong>注意:</strong> 出现问题请联系管理员！</p>
+<p class='attribute'><strong>报告生成日期:</strong> 2022-01-14 10:07:49</p>
+<p class='attribute'><strong>用例执行时间:</strong> 0:00:04.329882秒</p>
+<p class='attribute'><strong>用例执行结果:</strong> 通过 4,</p>
+<p class='attribute'><strong>执行系统:</strong> win32</p>
+
+<br>
+</div>
+
+
+<p></p>
+<div class="btn">
+<p>查看:
+<button style="background-color: #ffffdc" class="wqrf_button" onclick='javascript:showCase(0)'>总结</button>
+<button style="background-color: #af2928;color: white" class="wqrf_button" onclick='javascript:showCase(1)'>失败</button>
+<button style="background-color: #2a980f;color: white" class="wqrf_button" onclick='javascript:showCase(2)'>通过</button>
+<button style="background-color: #203ee6;color: white"  class="wqrf_button" onclick='javascript:showCase(3)'>全部</button>
+<button style="background-color: #8ceeb8;position: absolute;top: 58px;left:560px;width: 295px;height: 170px;border-radius: 10px" id='showAllTest' class="wqrf_button"  onclick='javascript:showAllTest()'><span style="font-size: xx-large">全 部 展 开</span></button>
+
+
+</p>
+</div>
+<p></p>
+<table id='result_table'>
+<colgroup>
+<col align='left' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+</colgroup>
+<tr id='header_row'>
+    <td>测试套件/测试用例</td>
+    <td>总数量</td>
+    <td>通过的</td>
+    <td>失败的</td>
+    <td>报错的</td>
+    <td>查看</td>
+
+</tr>
+
+<tr class='passClass'>
+    <td>Myapp.run_case.Test: _测试类_</td>
+    <td>4</td>
+    <td>4</td>
+    <td>0</td>
+    <td>0</td>
+    <td><button class="wqrf_button" style="background-color: #ffd1e7"  onclick="javascript:showClassDetail('c1',4)">详细</button></td>
+
+</tr>
+
+<tr id='pt1.1' class='hiddenRow'>
+    <td class='none'><div class='testcase'>test_05001: 获取PS1设备列表-得到homeid</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <a class="popup_liznk" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.1')" >
+        <button class="wqrf_button" style="width: auto">通过详情</button></a>
+    <div id='div_pt1.1' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.1').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.1: 【host】： https://eu-https-test.topband-cloud.com
+【url】： /ember-web/homesVT/allHomes/SS
+【header】： {'Content-Type': 'application/json;charset=utf-8'}
+【method】： post
+【body_method】： Json
+【body】： {"ascOrDesc": null,
+"endTime": null,
+"gatewaySerial": null,
+"homeName": null,
+"online": null,
+"orderBy": null,
+"pageNumber": 1,
+"pageSize": 10,
+"startTime": null,
+"systemType": "EMBER-PS",
+"type": null,
+"version": null}
+
+
+【登录态】： {'authorization': 'a21d6640be464c82956a985bfc36b36a', 'project_id': '1'}
+【返回体】： {
+	"data":{
+		"total":18,
+		"rows":[
+			{
+				"activateTime":"2021-03-16 10:01:08.000",
+				"gatewaySerial":"1807139818",
+				"homeName":"Home1807139818",
+				"id":"728ad60d13f94b4489a1d5d178ee9b31",
+				"isOnline":1,
+				"lastRefreshed":"2022-01-14 02:03:16.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"07b278a56bf111b2c303414ccb46ec1f",
+				"wifiVersion":100131
+			},
+			{
+				"activateTime":"2020-11-05 09:34:27.000",
+				"gatewaySerial":"1663760344",
+				"homeName":"home0344。ps1",
+				"id":"fe90fdbf270c43fe8a5584cd5861a507",
+				"isOnline":1,
+				"lastRefreshed":"2022-01-13 09:04:00.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":3,
+				"uid":"5523112f93a7add179038f9223a72405",
+				"wifiVersion":100131
+			},
+			{
+				"activateTime":"2021-03-16 11:31:10.000",
+				"gatewaySerial":"1801090364",
+				"homeName":"Home1801090364",
+				"id":"2be129cb5dc6402d9e2e1b736cf81289",
+				"isOnline":0,
+				"lastRefreshed":"2021-09-27 07:10:38.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"44f25f18616c46f1d7416db7dc34a7f4",
+				"wifiVersion":100131
+			},
+			{
+				"activateTime":"2021-03-16 11:32:39.000",
+				"gatewaySerial":"1807139910",
+				"homeName":"Home1807139910",
+				"id":"cdc676d4493b49bfb22658429581a7dd",
+				"isOnline":0,
+				"lastRefreshed":"2021-04-28 04:15:24.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"474f5c963b3bda7777b56dd41a6484fc",
+				"wifiVersion":100131
+			},
+			{
+				"activateTime":"2021-03-16 11:34:17.000",
+				"gatewaySerial":"1807139836",
+				"homeName":"Home1807139836",
+				"id":"7057e3d6174d45429e71713101286322",
+				"isOnline":0,
+				"lastRefreshed":"2021-04-28 04:15:01.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"f3728233d68b8cd4d4a82737f6fca2f8",
+				"wifiVersion":100131
+			},
+			{
+				"activateTime":"2021-03-16 11:36:22.000",
+				"gatewaySerial":"1807139594",
+				"homeName":"Home1807139594",
+				"id":"6f1b8a08b0dd4e19872e93cb83ad85f8",
+				"isOnline":0,
+				"lastRefreshed":"2021-03-30 01:32:51.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"e3109e9fd069fdaf360e63171ae56ab7",
+				"wifiVersion":100131
+			},
+			{
+				"activateTime":"2021-03-16 11:45:00.000",
+				"gatewaySerial":"1807139712",
+				"homeName":"Home   1807139712",
+				"id":"4db89b22bd574b2e8ebcfbaaa87867cc",
+				"isOnline":0,
+				"lastRefreshed":"2021-03-16 11:48:09.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"c2596861288c32144d91e1bda9bd05a8",
+				"wifiVersion":100130
+			},
+			{
+				"activateTime":"2021-03-16 11:43:39.000",
+				"gatewaySerial":"1807139616",
+				"homeName":"Home   1807139616",
+				"id":"78257686fa244b11a36eab740fc543ee",
+				"isOnline":0,
+				"lastRefreshed":"2021-03-16 11:46:48.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"98d3e80827bceaf674430379bf3e493e",
+				"wifiVersion":100130
+			},
+			{
+				"activateTime":"2021-03-16 11:41:26.000",
+				"gatewaySerial":"1801096266",
+				"homeName":"Home   1801096266",
+				"id":"daf6c5e7f0be45a5b64fe76c2375a3a3",
+				"isOnline":0,
+				"lastRefreshed":"2021-03-16 11:44:34.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"e973d82f03d454c15ce90ff53a08b2f2",
+				"wifiVersion":100130
+			},
+			{
+				"activateTime":"2021-03-16 11:39:58.000",
+				"gatewaySerial":"1807139722",
+				"homeName":"Home  1807139722",
+				"id":"1b632f86e8024226bd52f395438f08d7",
+				"isOnline":0,
+				"lastRefreshed":"2021-03-16 11:43:07.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":0,
+				"uid":"13a516c33a81676e2f6125e2748d5549",
+				"wifiVersion":100130
+			}
+		]
+	},
+	"message":"succ",
+	"status":0,
+	"timestamp":1642126071520
+}
+提取值 homeid 728ad60d13f94b4489a1d5d178ee9b31
+
+
+         <div id="div100">
+        </div>
+        </pre>
+    </div> <br>
+    <!--css div popup end-->
+
+    </td>
+</tr>
+
+<tr id='pt1.2' class='hiddenRow'>
+    <td class='none'><div class='testcase'>test_05002: 查看PS1设备详情</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <a class="popup_liznk" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.2')" >
+        <button class="wqrf_button" style="width: auto">通过详情</button></a>
+    <div id='div_pt1.2' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.2').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.2: 【host】： https://eu-https-test.topband-cloud.com
+【url】： /ember-web/homesVT/view
+【header】： {'Content-Type': 'application/json;charset=utf-8'}
+【method】： post
+【body_method】： Json
+【body】： {"homeId":'728ad60d13f94b4489a1d5d178ee9b31'}
+【登录态】： {'authorization': 'a21d6640be464c82956a985bfc36b36a', 'project_id': '1'}
+【返回体】： {
+	"data":{
+		"activationDate":"2021-03-16 10:01:08.000",
+		"associatedUser":[
+			{
+				"accessfailedcount":0,
+				"areacode":null,
+				"email":"zhangfangjian@szacs.com",
+				"emailconfirmed":true,
+				"firstname":"Zhang",
+				"id":17690,
+				"jointime":"2021-03-16 10:58:46",
+				"lastname":"fangjian",
+				"lockoutenabled":true,
+				"lockoutenddateutc":null,
+				"newsmarketing":false,
+				"phonenumber":"18027664880",
+				"phonenumberconfirmed":false,
+				"primaryexternalloginprovider":null,
+				"profilepictureuri":null,
+				"profilepicurelastsynced":null,
+				"registrationtime":"2019-09-02 07:41:41.000",
+				"role":"Home Super Admin",
+				"roleid":3,
+				"securitystamp":null,
+				"synchroniseprofilepicture":false,
+				"systemmaintenance":false,
+				"twofactorenabled":false,
+				"useprimaryexternalproviderpicture":false,
+				"username":"zhangfangjian@szacs.com"
+			}
+		],
+		"firmwareVersion":"100131",
+		"gatewayID":"1807139818",
+		"id":"728ad60d13f94b4489a1d5d178ee9b31",
+		"inviteCode":"623E8",
+		"isOnline":true,
+		"lastRefreshed":"2022-01-14 02:03:16.000",
+		"location":null,
+		"mcuSoftware":"0",
+		"productionDate":"2021-03-16 10:00:39.000",
+		"systemType":"EMBER-PS",
+		"uid":"07b278a56bf111b2c303414ccb46ec1f",
+		"wifiSoftware":"100131"
+	},
+	"message":"succ",
+	"status":0,
+	"timestamp":1642126072417
+}
+
+
+         <div id="div100">
+        </div>
+        </pre>
+    </div> <br>
+    <!--css div popup end-->
+
+    </td>
+</tr>
+
+<tr id='pt1.3' class='hiddenRow'>
+    <td class='none'><div class='testcase'>test_05003: 获取TS设备列表-得到homeid</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <a class="popup_liznk" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.3')" >
+        <button class="wqrf_button" style="width: auto">通过详情</button></a>
+    <div id='div_pt1.3' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.3').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.3: 【host】： https://eu-https-test.topband-cloud.com
+【url】： /ember-web/homesVT/allHomes/SS
+【header】： {'Content-Type': 'application/json;charset=utf-8'}
+【method】： post
+【body_method】： Json
+【body】： {"ascOrDesc": null,
+"endTime": null,
+"gatewaySerial": null,
+"homeName": null,
+"online": null,
+"orderBy": null,
+"pageNumber": 1,
+"pageSize": 10,
+"startTime": null,
+"systemType": "EMBER-TS",
+"type": null,
+"version": null}
+
+
+【登录态】： {'authorization': 'a21d6640be464c82956a985bfc36b36a', 'project_id': '1'}
+【返回体】： {
+	"data":{
+		"total":11,
+		"rows":[
+			{
+				"activateTime":"2019-08-22 15:28:50.000",
+				"gatewaySerial":"dc4f224f60c8",
+				"homeName":"home TS 60c8",
+				"id":"7654854545f243fe950f0df63c30e3f6",
+				"isOnline":0,
+				"lastRefreshed":"2021-10-19 04:34:23.000",
+				"mcuVersion":100112,
+				"numberOfUsers":1,
+				"numberOfZones":2,
+				"uid":"902f18f17f9da26463583f7193379ff8",
+				"wifiVersion":100151
+			},
+			{
+				"activateTime":"2019-08-22 14:54:26.000",
+				"gatewaySerial":"dc4f224f6097",
+				"homeName":"home122--6097–自-2.4",
+				"id":"1b36fcc70a854d07ad943287ed211d84",
+				"isOnline":0,
+				"lastRefreshed":"2021-10-19 04:24:56.000",
+				"mcuVersion":100112,
+				"numberOfUsers":1,
+				"numberOfZones":2,
+				"uid":"3a9be07e2ae32a8308c799f0d6a933a1",
+				"wifiVersion":100151
+			},
+			{
+				"activateTime":"2020-03-05 09:05:03.000",
+				"gatewaySerial":"6001942942da",
+				"homeName":"Home",
+				"id":"917fc19aad7c44ed820f299ac23b7300",
+				"isOnline":0,
+				"lastRefreshed":"2020-03-09 06:55:39.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":1,
+				"uid":"e4e9ebb0dc09c278c2ebe649ea670744",
+				"wifiVersion":100136
+			},
+			{
+				"activateTime":"2019-09-29 11:34:44.000",
+				"gatewaySerial":"dc4f224f613c",
+				"homeName":"旧2 dc4f224f613c",
+				"id":"2fffa74d7c9a4981b6ce40430fc6496c",
+				"isOnline":0,
+				"lastRefreshed":"2019-12-30 01:51:39.000",
+				"mcuVersion":100005,
+				"numberOfUsers":1,
+				"numberOfZones":3,
+				"uid":"13de83e633780e0ecfc8c80ccee36607",
+				"wifiVersion":100118
+			},
+			{
+				"activateTime":"2019-08-22 14:52:55.000",
+				"gatewaySerial":"dc4f224f607c",
+				"homeName":"Emily's Home",
+				"id":"804dd77870f14f9c88b766a98771e227",
+				"isOnline":0,
+				"lastRefreshed":"2019-12-13 09:57:05.000",
+				"mcuVersion":100000,
+				"numberOfUsers":5,
+				"numberOfZones":6,
+				"uid":"40a3e498ca40b2a7ce18e763009babef",
+				"wifiVersion":100000
+			},
+			{
+				"activateTime":"2019-11-18 07:56:08.000",
+				"gatewaySerial":"dc4f224f61ad",
+				"homeName":"61Ad",
+				"id":"25766816799648f4b00a0d5c6774ee76",
+				"isOnline":0,
+				"lastRefreshed":"2019-12-10 08:34:53.000",
+				"mcuVersion":100102,
+				"numberOfUsers":1,
+				"numberOfZones":1,
+				"uid":"bf209064a3899c103317eb2ecf8a70a1",
+				"wifiVersion":100136
+			},
+			{
+				"activateTime":"2019-09-20 16:49:13.000",
+				"gatewaySerial":"dc4f224f61c7",
+				"homeName":"home",
+				"id":"e84e3c44d7e74ba9b8100b54d67a6c7d",
+				"isOnline":0,
+				"lastRefreshed":"2019-11-15 07:24:23.000",
+				"mcuVersion":100005,
+				"numberOfUsers":1,
+				"numberOfZones":4,
+				"uid":"d1ea55008347b53517e4dcda7ff135ad",
+				"wifiVersion":100118
+			},
+			{
+				"activateTime":"2019-09-23 18:30:26.000",
+				"gatewaySerial":"dc4f224f60a4",
+				"homeName":"Home",
+				"id":"4adc2d74a80247c8bf2095dd54cd0800",
+				"isOnline":0,
+				"lastRefreshed":"2019-10-25 15:39:01.000",
+				"mcuVersion":100000,
+				"numberOfUsers":1,
+				"numberOfZones":1,
+				"uid":"4c7ea0f03dfcf2ef18976221dde9a6ce",
+				"wifiVersion":100118
+			},
+			{
+				"activateTime":"2019-09-27 10:26:44.000",
+				"gatewaySerial":"dc4f224f60c5",
+				"homeName":"新1 dc4f224f60c5",
+				"id":"43e4a012a23b4da9b1500761cde22b89",
+				"isOnline":0,
+				"lastRefreshed":"2019-10-23 19:04:32.000",
+				"mcuVersion":0,
+				"numberOfUsers":1,
+				"numberOfZones":6,
+				"uid":"1dc47489d4d06864ac25e8def3d8291b",
+				"wifiVersion":100126
+			},
+			{
+				"activateTime":"2019-09-05 16:14:04.000",
+				"gatewaySerial":"dc4f224f60ba",
+				"homeName":"home",
+				"id":"4a0541206e834568a9fd2a7b94cceacb",
+				"isOnline":0,
+				"lastRefreshed":"2019-10-16 17:40:43.000",
+				"mcuVersion":100000,
+				"numberOfUsers":1,
+				"numberOfZones":4,
+				"uid":"a382aeddb42dfc4190cd653cbd536eef",
+				"wifiVersion":100119
+			}
+		]
+	},
+	"message":"succ",
+	"status":0,
+	"timestamp":1642126073257
+}
+提取值 homeid 7654854545f243fe950f0df63c30e3f6
+
+
+         <div id="div100">
+        </div>
+        </pre>
+    </div> <br>
+    <!--css div popup end-->
+
+    </td>
+</tr>
+
+<tr id='pt1.4' class='hiddenRow'>
+    <td class='none'><div class='testcase'>test_05004: 查看Ts设备详情</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <a class="popup_liznk" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.4')" >
+        <button class="wqrf_button" style="width: auto">通过详情</button></a>
+    <div id='div_pt1.4' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.4').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        
+pt1.4: 【host】： https://eu-https-test.topband-cloud.com
+【url】： /ember-web/homesVT/view
+【header】： {'Content-Type': 'application/json;charset=utf-8'}
+【method】： post
+【body_method】： Json
+【body】： {"homeId": '7654854545f243fe950f0df63c30e3f6'}
+【登录态】： {'authorization': 'a21d6640be464c82956a985bfc36b36a', 'project_id': '1'}
+【返回体】： {
+	"data":{
+		"activationDate":"2019-08-22 15:28:50.000",
+		"associatedUser":[
+			{
+				"accessfailedcount":0,
+				"areacode":null,
+				"email":"sz202008@yahoo.com",
+				"emailconfirmed":true,
+				"firstname":"guo",
+				"id":31479,
+				"jointime":"2021-08-19 10:11:28",
+				"lastname":"guo",
+				"lockoutenabled":true,
+				"lockoutenddateutc":null,
+				"newsmarketing":false,
+				"phonenumber":"13800138000",
+				"phonenumberconfirmed":false,
+				"primaryexternalloginprovider":null,
+				"profilepictureuri":null,
+				"profilepicurelastsynced":null,
+				"registrationtime":"2021-03-08 01:17:14.000",
+				"role":"Home Super Admin",
+				"roleid":3,
+				"securitystamp":null,
+				"synchroniseprofilepicture":false,
+				"systemmaintenance":false,
+				"twofactorenabled":false,
+				"useprimaryexternalproviderpicture":false,
+				"username":"sz202008@yahoo.com"
+			}
+		],
+		"firmwareVersion":"100151",
+		"gatewayID":"dc4f224f60c8",
+		"id":"7654854545f243fe950f0df63c30e3f6",
+		"inviteCode":"26FD8",
+		"isOnline":false,
+		"lastRefreshed":"2021-10-19 04:34:23.000",
+		"location":"巴利阿克利,爱尔兰",
+		"mcuSoftware":"100112",
+		"productionDate":"2019-08-22 01:25:27.000",
+		"systemType":"EMBER-TS",
+		"uid":"902f18f17f9da26463583f7193379ff8",
+		"wifiSoftware":"100151"
+	},
+	"message":"succ",
+	"status":0,
+	"timestamp":1642126074124
+}
+
+
+         <div id="div100">
+        </div>
+        </pre>
+    </div> <br>
+    <!--css div popup end-->
+
+    </td>
+</tr>
+
+<tr id='total_row'>
+    <td>总计</td>
+    <td>4</td>
+    <td>4</td>
+    <td>0</td>
+    <td>0</td>
+    <td><button class="wqrf_button" style="background-color: #ffc2e6" onclick='javascript:location.reload()'>刷新</button></td>
+
+</tr>
+</table>
+
+<div id='ending'>
+   <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </div>
+    
+
+</body>
+</html>
